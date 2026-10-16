@@ -1,0 +1,8 @@
+# Hugo output and caches
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# Python
+__pycache__/
+*.pyc

@@ -1,0 +1,35 @@
+SuperconducTED/superconducted.github.io
+Copyright (c) 2026 SuperconducTED contributors
+
+This repository is licensed in two parts (owner decision, 2026-10-16).
+
+1. MIT License (LICENSE): the code that builds the site: hugo.toml, layouts/,
+   assets/ (stylesheets and scripts), scripts/ and .github/.
+
+2. Creative Commons Attribution 4.0 International, CC BY 4.0
+   (https://creativecommons.org/licenses/by/4.0/): the text of the site:
+   content/, i18n/, data/team.yaml, data/facts.yaml and docs/. It may be shared
+   and adapted, with credit ("SuperconducTED website, (c) 2026 SuperconducTED
+   contributors, CC BY 4.0").
+
+Files under their own terms:
+
+- static/brand/, static/favicon*, static/apple-touch-icon.png,
+  static/app-icon-*.png and static/social-card.png are copied byte for byte
+  from the brand kit in SuperconducTED/.github (brand/kit/, commit recorded in
+  data/brand.yaml) and stay under CC BY 4.0 as set out in that repository's
+  brand/LICENSE-BRAND.md.
+- static/fonts/: Space Grotesk and Space Mono, subset to WOFF2 by
+  scripts/build_fonts.py, under the SIL Open Font License 1.1
+  (static/fonts/OFL-SpaceGrotesk.txt, static/fonts/OFL-SpaceMono.txt).
+- static/katex/: the stylesheet and fonts of KaTeX 0.18.4, under the MIT
+  License (static/katex/LICENSE.txt).
+- data/drift.json holds T1 values from IBM's calibration data for ibm_fez, as
+  archived by the noise engine's calibration poller; it is shown to illustrate
+  calibration drift, and no licence over IBM's data is claimed.
+
+Neither licence grants trademark rights. The name SuperconducTED and its marks
+identify the project; brand/LICENSE-BRAND.md in SuperconducTED/.github sets out
+what their use does not imply. IBM, IBM Quantum, Qiskit and Qiskit Aer are
+trademarks of IBM, named only to describe the tools and hardware the project
+works with.
