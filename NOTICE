@@ -16,7 +16,7 @@ Files under their own terms:
 
 - static/brand/, static/favicon*, static/apple-touch-icon.png,
   static/app-icon-*.png and static/social-card.png are copied byte for byte
-  from the brand kit in SuperconducTED/.github (brand/kit/, commit recorded in
+  from the brand kit in SuperconducTED/.github (brand/svg/ and brand/web/, commit recorded in
   data/brand.yaml) and stay under CC BY 4.0 as set out in that repository's
   brand/LICENSE-BRAND.md.
 - static/fonts/: Space Grotesk and Space Mono, subset to WOFF2 by

@@ -19,18 +19,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # source path in the .github repo -> path under static/
 FILES = {
-    "brand/kit/svg/superconducted-compact-on-light.svg": "brand/compact-on-light.svg",
-    "brand/kit/svg/superconducted-compact-on-dark.svg": "brand/compact-on-dark.svg",
-    "brand/kit/svg/superconducted-mark-on-light.svg": "brand/mark-on-light.svg",
-    "brand/kit/svg/superconducted-mark-on-dark.svg": "brand/mark-on-dark.svg",
-    "brand/kit/web/favicon.svg": "favicon.svg",
-    "brand/kit/web/favicon-16.png": "favicon-16.png",
-    "brand/kit/web/favicon-32.png": "favicon-32.png",
-    "brand/kit/web/favicon-48.png": "favicon-48.png",
-    "brand/kit/web/app-icon-180.png": "apple-touch-icon.png",
-    "brand/kit/web/app-icon-192.png": "app-icon-192.png",
-    "brand/kit/web/app-icon-512.png": "app-icon-512.png",
-    "brand/kit/web/social-card-noise-engine.png": "social-card.png",
+    "brand/svg/superconducted-compact-on-light.svg": "brand/compact-on-light.svg",
+    "brand/svg/superconducted-compact-on-dark.svg": "brand/compact-on-dark.svg",
+    "brand/svg/superconducted-mark-on-light.svg": "brand/mark-on-light.svg",
+    "brand/svg/superconducted-mark-on-dark.svg": "brand/mark-on-dark.svg",
+    "brand/web/favicon.svg": "favicon.svg",
+    "brand/web/favicon-16.png": "favicon-16.png",
+    "brand/web/favicon-32.png": "favicon-32.png",
+    "brand/web/favicon-48.png": "favicon-48.png",
+    "brand/web/app-icon-180.png": "apple-touch-icon.png",
+    "brand/web/app-icon-192.png": "app-icon-192.png",
+    "brand/web/app-icon-512.png": "app-icon-512.png",
+    "brand/web/social-card-noise-engine.png": "social-card.png",
 }
 
 

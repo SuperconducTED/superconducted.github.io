@@ -239,3 +239,32 @@ GitHub repo and says to push. The workflow file is `.github/workflows/pages.yml`
   shipped on Mert's "fix later".
 - Hugo 0.167.0 download checked against the release's `checksums.txt`; the workflow pins the
   Linux tarball's sha256 and every action by commit SHA.
+
+## As of 2026-10-16, evening: launched, facts switched on, brand paths moved
+
+The "uncommitted" status in the previous section is superseded:
+
+- **Repository and launch.** Mert created `SuperconducTED/superconducted.github.io` (public).
+  `main` started at `c1451eb` (README, licence, NOTICE). The site went in through PR #1 from
+  `site/first-version` (`18462d8`, which also added `.gitattributes` with `eol=lf`), merged as
+  `399ad84`.
+- **Pages source.** On the first push, GitHub had put the repository in "Deploy from a branch"
+  mode (`build_type: legacy`) and served the README through Jekyll 3.10.0. Claude switched it to
+  GitHub Actions (`build_type: workflow`) on Mert's word. Deploy run 38898972457 (build and
+  deploy) succeeded.
+- **Live check.** Every page and asset answers 200, missing paths get the custom 404, the root
+  picks the language, and the console is empty.
+- **Facts.** Engine PR #116 merged as `6a1ce505`, so NC-067 (156), NC-068 (2,050) and NC-069
+  (868 of ≥ 1170) are on the engine's `main`. Their `pending` flags are removed in this change,
+  and the facts strip shows all four figures.
+- **Brand paths.** `SuperconducTED/.github` PR #5 moved the kit from `brand/kit/` to `brand/`.
+  `scripts/sync_brand.py` now reads `brand/svg/` and `brand/web/`. Re-running it at `.github`
+  `main` (`ac5c4fc`) left every file in `static/` byte-identical: the moves were pure renames.
+  Only `data/brand.yaml`'s source paths and commit changed.
+- **Presence.** Description, homepage and topics (`hugo`, `github-pages`, `website`,
+  `quantum-computing`) were set and read back. The engine's and `.github`'s homepages point at
+  the site.
+- **Turkish number format.** The facts strip used `lang.FormatNumberCustom`, which ignores
+  the locale, so the Turkish page printed "2,050". It now uses `lang.FormatNumber`, which
+  follows each language's locale: "2,050" and "of 1,170" in English, "2.050" and "/ 1.170" in
+  Turkish (checked in a clean production build).
