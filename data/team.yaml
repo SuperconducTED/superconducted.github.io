@@ -7,8 +7,8 @@ members:
   - name: "Mert Efe Şensoy"
     github: "mertefesensoy"
     role:
-      en: "Computer Science, junior"
-      tr: "Bilgisayar Bilimleri, 3. sınıf"
+      en: "Computer Science, senior"
+      tr: "Bilgisayar Bilimleri, 4. sınıf"
     owns: ["interfaces.py", "types.py", "training/parameters.py", "training/targets.py", "pyproject.toml", ".github/workflows/ci.yml"]
   - name: "Burak Öztekin"
     github: "BurakOztekin"
