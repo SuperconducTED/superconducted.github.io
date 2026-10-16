@@ -1,0 +1,25 @@
+{{- $lang := site.Language.Lang }}
+{{- with hugo.Data.team }}
+<section aria-labelledby="team-members">
+  <h2 id="team-members">{{ T "team_members" }}</h2>
+  <ul class="people">
+    {{- range .members }}
+    <li class="person">
+      <h3>{{ .name }}</h3>
+      <p class="role">{{ index .role $lang }}</p>
+      <p class="owns"><span class="owns-label">{{ T "team_owns" }}:</span>
+        {{- range $i, $m := .owns }}{{ if $i }},{{ end }} <code>{{ $m }}</code>{{ end }}</p>
+      <p><a href="https://github.com/{{ .github }}" aria-label="{{ T "team_profile" }} {{ .name }}">@{{ .github }}</a></p>
+    </li>
+    {{- end }}
+  </ul>
+</section>
+<section aria-labelledby="team-advisor">
+  <h2 id="team-advisor">{{ T "team_advisor" }}</h2>
+  <ul class="people">
+    <li class="person">
+      <h3>{{ .advisor.name }}</h3>
+    </li>
+  </ul>
+</section>
+{{- end }}

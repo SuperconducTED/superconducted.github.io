@@ -1,0 +1,48 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- /* KaTeX positions glyphs with inline style attributes, so pages with math allow inline
+styles; hugo server's live reload needs a websocket. */ -}}
+{{- $style := cond (.Params.math | default false) "'self' 'unsafe-inline'" "'self'" }}
+{{- $connect := cond hugo.IsDevelopment "'self' ws://localhost:1313" "'none'" }}
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src {{ $style | safeHTMLAttr }}; font-src 'self'; script-src 'self'; connect-src {{ $connect | safeHTMLAttr }}; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+{{- $title := cond .IsHome (printf "SuperconducTED: %s" site.Params.tagline) (printf "%s · SuperconducTED" .Title) }}
+<title>{{ $title }}</title>
+{{- $desc := or .Description site.Params.description }}
+<meta name="description" content="{{ $desc }}">
+<link rel="canonical" href="{{ .Permalink }}">
+{{- range .AllTranslations }}
+<link rel="alternate" hreflang="{{ .Language.Locale }}" href="{{ .Permalink }}">
+{{- end }}
+{{- if .IsHome }}
+<link rel="alternate" hreflang="x-default" href="{{ "/" | absURL }}">
+{{- end }}
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#EEF3F5">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A1B24">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SuperconducTED">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:image" content="{{ "social-card.png" | absURL }}">
+<meta property="og:image:alt" content="SuperconducTED: {{ site.Params.tagline }}">
+<meta property="og:locale" content="{{ cond (eq site.Language.Lang "tr") "tr_TR" "en_US" }}">
+{{- range .Translations }}
+<meta property="og:locale:alternate" content="{{ cond (eq .Language.Lang "tr") "tr_TR" "en_US" }}">
+{{- end }}
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="{{ "favicon.svg" | absURL }}" type="image/svg+xml">
+<link rel="icon" href="{{ "favicon-32.png" | absURL }}" sizes="32x32" type="image/png">
+<link rel="icon" href="{{ "favicon-16.png" | absURL }}" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | absURL }}">
+<link rel="manifest" href="{{ "site.webmanifest" | absURL }}">
+<link rel="preload" href="{{ "fonts/space-grotesk-400.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "fonts/space-grotesk-700.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+{{- if .Params.math }}
+<link rel="stylesheet" href="{{ "katex/katex.min.css" | absURL }}">
+{{- end }}
+{{- $css := resources.Get "css/site.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $boot := resources.Get "js/theme-boot.js" | minify | fingerprint }}
+<script src="{{ $boot.RelPermalink }}" integrity="{{ $boot.Data.Integrity }}"></script>

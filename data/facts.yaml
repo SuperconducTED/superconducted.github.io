@@ -1,0 +1,35 @@
+# The Home page's facts strip. Every value is copied from a row of the noise engine's
+# numerical-claims register (docs/numerical-claims.md); the site never computes one.
+#   value: the registered value          nc: the register row id
+#   of / of_nc: an optional "N of M" total and its row
+#   as_of: the row's measurement date     label: the i18n key for the text under the value
+#   pending: true while the row is only proposed. `hugo server` shows a pending fact with a
+#            marker; production builds leave it out, and scripts/check_site.py fails if one ships.
+#            NC-067..069 are proposed on the engine branch mert/website-facts-register: set
+#            pending to false once that branch is merged.
+facts:
+  - key: qubits
+    value: 156
+    nc: NC-067
+    as_of: 2026-10-16
+    label: fact_qubits
+    pending: true
+  - key: states
+    value: 868
+    of: 1170
+    of_nc: NC-045
+    nc: NC-069
+    as_of: 2026-10-16
+    label: fact_states
+    pending: true
+  - key: snapshots
+    value: 2050
+    nc: NC-068
+    as_of: 2026-10-16
+    label: fact_snapshots
+    pending: true
+  - key: tests
+    value: 809
+    nc: NC-021
+    as_of: 2026-10-15
+    label: fact_tests

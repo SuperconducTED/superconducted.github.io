@@ -1,0 +1,88 @@
+{{ define "main" }}
+<section class="hero wrap">
+  <div class="hero-mark">
+    <img class="on-light" src="{{ "brand/mark-on-light.svg" | absURL }}" alt="" width="1024" height="1024">
+    <img class="on-dark" src="{{ "brand/mark-on-dark.svg" | absURL }}" alt="" width="1024" height="1024">
+  </div>
+  <div class="hero-text">
+    <h1>SuperconducTED</h1>
+    <p class="tagline" lang="en">{{ site.Params.tagline }}</p>
+    <p class="lead">{{ .Params.lead }}</p>
+    <p class="actions">
+      <a class="button primary" href="{{ relLangURL "how-it-works/" }}">{{ T "cta_how" }}</a>
+      <a class="button" href="{{ relLangURL "get-started/" }}">{{ T "cta_start" }}</a>
+      <a class="button" href="{{ site.Params.repo }}">{{ T "cta_repo" }}</a>
+    </p>
+  </div>
+</section>
+
+<aside class="notice wrap" role="note" aria-labelledby="preview-title">
+  <p><strong id="preview-title">{{ T "preview_title" }}.</strong> {{ T "preview_text" }}</p>
+</aside>
+
+{{- with hugo.Data.drift }}
+{{- $pts := .points }}
+{{- $first := index $pts 0 }}
+{{- $last := index $pts (sub (len $pts) 1) }}
+{{- $vals := slice }}{{ range $pts }}{{ $vals = $vals | append (index . 1) }}{{ end }}
+{{- $from := time.Format ":date_long" (time.AsTime (index $first 0)) }}
+{{- $to := time.Format ":date_long" (time.AsTime (index $last 0)) }}
+<section class="demo wrap" aria-labelledby="demo-title">
+  <h2 id="demo-title">{{ T "demo_title" }}</h2>
+  <figure>
+    <div class="demo-chart" id="drift-chart" role="img"
+         aria-label="{{ T "demo_summary" (dict "qubit" .qubit "min" (lang.FormatNumber 1 (math.Min $vals)) "max" (lang.FormatNumber 1 (math.Max $vals)) "n" (len $pts) "first" (lang.FormatNumber 1 (index $first 1))) }}"
+         data-label-measured="{{ T "demo_measured" }}" data-label-frozen="{{ T "demo_frozen" }}"
+         data-label-band="{{ T "demo_band" }}" data-label-y="{{ T "demo_axis_y" }}"
+         data-locale="{{ site.Language.Locale }}"></div>
+    <figcaption>
+      <ul class="legend" aria-hidden="true">
+        <li class="lg-measured">{{ T "demo_measured" }}</li>
+        <li class="lg-frozen">{{ T "demo_frozen" }}</li>
+        <li class="lg-band">{{ T "demo_band" }}</li>
+      </ul>
+      <p>{{ T "demo_caption" (dict "qubit" .qubit "backend" .source.backend "from" $from "to" $to "window" .band.window_days) }}</p>
+      <p class="small"><a href="https://github.com/SuperconducTED/superconducted-noise-engine/tree/{{ .source.ref }}/health">{{ T "demo_source" (dict "ref" (substr .source.ref 0 7)) }}</a></p>
+      <p><button class="button small-button" type="button" id="drift-replay" hidden>{{ T "demo_replay" }}</button></p>
+    </figcaption>
+  </figure>
+  <script type="application/json" id="drift-data">{{ jsonify (dict "points" .points "qubit" .qubit) | safeJS }}</script>
+</section>
+{{- end }}
+
+<section class="steps wrap" aria-labelledby="steps-title">
+  <h2 id="steps-title">{{ T "steps_title" }}</h2>
+  <ol class="step-list">
+    {{- range .Params.steps }}
+    <li>
+      <h3>{{ .title }}</h3>
+      <p>{{ .text | markdownify }}</p>
+    </li>
+    {{- end }}
+  </ol>
+</section>
+
+<section class="facts wrap" aria-labelledby="facts-title">
+  <h2 id="facts-title">{{ T "facts_title" }}</h2>
+  <ul class="fact-list">
+    {{- range hugo.Data.facts.facts }}
+    {{- if or (not .pending) (not hugo.IsProduction) }}
+    <li{{ if .pending }} class="pending"{{ end }}>
+      <p class="fact-value">{{ lang.FormatNumberCustom 0 .value }}{{ with .of }} <span class="fact-of">{{ T "fact_of" }} {{ lang.FormatNumberCustom 0 . }}</span>{{ end }}</p>
+      <p class="fact-label">{{ T .label }}</p>
+      <p class="fact-source small">
+        {{- if .pending }}{{ T "fact_pending" }}{{ else }}<a href="{{ site.Params.register }}">{{ .nc }}</a>{{ end }}
+        {{- with .of_nc }} · <a href="{{ site.Params.register }}">{{ . }}</a>{{ end }}
+        · {{ T "as_of" }} {{ time.Format ":date_medium" .as_of }}</p>
+    </li>
+    {{- end }}
+    {{- end }}
+  </ul>
+  <p class="small">{{ T "facts_note" }}</p>
+</section>
+{{ end }}
+
+{{ define "scripts" }}
+{{- $demo := resources.Get "js/drift-demo.js" | minify | fingerprint }}
+<script src="{{ $demo.RelPermalink }}" integrity="{{ $demo.Data.Integrity }}" defer></script>
+{{ end }}

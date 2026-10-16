@@ -1,0 +1,12 @@
+{{- /* LaTeX between \( \) or $$ $$ is typeset at build time by Hugo's embedded KaTeX (0.18.4 in
+Hugo 0.167.0) as HTML for display plus MathML for screen readers. No script reaches the reader;
+the page needs static/katex/katex.min.css, which head.html loads when front matter sets
+math: true. A LaTeX error fails the build. */ -}}
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq .Type "block") "throwOnError" true }}
+{{- with try (transform.ToMath .Inner $opts) }}
+  {{- with .Err }}
+    {{- errorf "math in %s: %s" $.Page.File.Path . }}
+  {{- else }}
+    {{- if eq $.Type "block" }}<div class="math-block">{{ .Value }}</div>{{ else }}{{ .Value }}{{ end }}
+  {{- end }}
+{{- end -}}

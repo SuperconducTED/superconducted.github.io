@@ -1,0 +1,5 @@
+# Keep LF in every checkout: data/brand.yaml records byte hashes of the brand files and
+# scripts/extract_drift.py promises byte-identical output, which a CRLF rewrite would break.
+* text=auto eol=lf
+*.png binary
+*.woff2 binary

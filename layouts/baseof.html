@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ site.Language.Locale }}" data-theme="auto">
+<head>
+  {{- partial "head.html" . }}
+</head>
+<body class="kind-{{ .Kind }}{{ with .Layout }} layout-{{ . }}{{ end }}">
+  <a class="skip" href="#main">{{ T "skip" }}</a>
+  {{- partial "header.html" . }}
+  <main id="main" tabindex="-1">
+    {{- block "main" . }}{{ end }}
+  </main>
+  {{- partial "footer.html" . }}
+  {{- $theme := resources.Get "js/theme.js" | minify | fingerprint }}
+  <script src="{{ $theme.RelPermalink }}" integrity="{{ $theme.Data.Integrity }}" defer></script>
+  {{- block "scripts" . }}{{ end }}
+</body>
+</html>

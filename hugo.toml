@@ -1,0 +1,73 @@
+baseURL = 'https://superconducted.github.io/'
+title = 'SuperconducTED'
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = true
+disableKinds = ['taxonomy', 'term', 'rss']
+enableRobotsTXT = true
+timeZone = 'UTC'
+
+[build]
+  [build.buildStats]
+    enable = false
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['$$', '$$']]
+          inline = [['\(', '\)']]
+    [markup.goldmark.renderer]
+      unsafe = false
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 2
+
+[params]
+  org = 'https://github.com/SuperconducTED'
+  repo = 'https://github.com/SuperconducTED/superconducted-noise-engine'
+  register = 'https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/numerical-claims.md'
+  brandGuide = 'https://github.com/SuperconducTED/.github/blob/main/brand/README.md'
+  siteRepo = 'https://github.com/SuperconducTED/superconducted.github.io'
+  tagline = 'Noise as a range, not a number.'
+
+[languages]
+  [languages.en]
+    contentDir = 'content/en'
+    label = 'English'
+    locale = 'en'
+    weight = 1
+    [languages.en.params]
+      description = "SuperconducTED is a student research project building a fuzzy-logic noise engine for Qiskit Aer: a drifting quantum computer's noise, answered with a range instead of one number."
+    [[languages.en.menus.main]]
+      name = 'How it works'
+      pageRef = '/how-it-works'
+      weight = 1
+    [[languages.en.menus.main]]
+      name = 'Team'
+      pageRef = '/team'
+      weight = 2
+    [[languages.en.menus.main]]
+      name = 'Get started'
+      pageRef = '/get-started'
+      weight = 3
+  [languages.tr]
+    contentDir = 'content/tr'
+    label = 'Türkçe'
+    locale = 'tr'
+    weight = 2
+    [languages.tr.params]
+      description = "SuperconducTED, Qiskit Aer için bulanık mantık tabanlı bir gürültü motoru geliştiren bir öğrenci araştırma projesidir: sürüklenen bir kuantum bilgisayarın gürültüsüne tek bir sayıyla değil, bir aralıkla yanıt verir."
+    [[languages.tr.menus.main]]
+      name = 'Nasıl çalışır'
+      pageRef = '/how-it-works'
+      weight = 1
+    [[languages.tr.menus.main]]
+      name = 'Ekip'
+      pageRef = '/team'
+      weight = 2
+    [[languages.tr.menus.main]]
+      name = 'Başlarken'
+      pageRef = '/get-started'
+      weight = 3
