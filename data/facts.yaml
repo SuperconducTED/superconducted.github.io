@@ -25,7 +25,7 @@ facts:
     as_of: 2026-10-16
     label: fact_snapshots
   - key: tests
-    value: 809
+    value: 859
     nc: NC-021
-    as_of: 2026-10-15
+    as_of: 2026-10-16
     label: fact_tests
