@@ -1,0 +1,83 @@
+# Builds the site with a pinned Hugo release, checks it, and deploys it to GitHub Pages.
+#   * Pull requests: build and check only, so a broken page fails the PR before it can merge.
+#   * Pushes to main (and manual runs): build, check, deploy.
+# One-time setting, made by an org owner: Settings > Pages > Build and deployment > Source:
+# "GitHub Actions". Actions are pinned to commit SHAs; the comment names the release.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      HUGO_VERSION: 0.167.0
+      # sha256 of hugo_0.167.0_linux-amd64.tar.gz from the release's hugo_0.167.0_checksums.txt
+      HUGO_SHA256: 4d84519b9f619e6d4c3fb45a50157abeabeb724f859c60605f44c23def6e1169
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Hugo ${{ env.HUGO_VERSION }}
+        run: |
+          curl -sSfLo hugo.tar.gz "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-amd64.tar.gz"
+          echo "${HUGO_SHA256}  hugo.tar.gz" | sha256sum --check --strict -
+          mkdir -p "${HOME}/.local/hugo"
+          tar -xzf hugo.tar.gz -C "${HOME}/.local/hugo" hugo
+          rm hugo.tar.gz
+          echo "${HOME}/.local/hugo" >> "${GITHUB_PATH}"
+
+      - name: Configure Pages
+        id: pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Build
+        env:
+          BASE_URL: ${{ steps.pages.outputs.base_url || 'https://superconducted.github.io' }}
+        run: |
+          hugo version
+          hugo build --gc --minify --printI18nWarnings --panicOnWarning --baseURL "${BASE_URL%/}/"
+          # GitHub Pages serves /404.html for every missing path; Hugo writes one per language.
+          cp public/en/404.html public/404.html
+
+      - name: Check
+        run: |
+          # The facts strip must agree with the engine's register on main.
+          curl -sSfLo register.md https://raw.githubusercontent.com/SuperconducTED/superconducted-noise-engine/main/docs/numerical-claims.md
+          python3 -I scripts/check_site.py public --register register.md
+
+      - name: Upload
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: public
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

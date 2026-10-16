@@ -1,0 +1,48 @@
+{{- /*
+Hugo uses this template for every alias page. With defaultContentLanguageInSubdir the only alias
+is the root page, which redirects to the default language's home. Here the root picks the
+language instead: a choice saved by the language switcher wins, then the first of the browser's
+languages that the site has, then English. Without script, the meta refresh goes to English and
+both links stay visible. Other aliases (none today) get a plain redirect to their target.
+*/ -}}
+{{- $root := eq .Permalink ("/en/" | absURL) -}}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperconducTED</title>
+<link rel="canonical" href="{{ .Permalink }}">
+{{- if $root }}
+<link rel="alternate" hreflang="en" href="{{ "/en/" | absURL }}">
+<link rel="alternate" hreflang="tr" href="{{ "/tr/" | absURL }}">
+<link rel="alternate" hreflang="x-default" href="{{ "/" | absURL }}">
+<link rel="icon" href="{{ "favicon.svg" | absURL }}" type="image/svg+xml">
+<script>
+(function () {
+  var pick = "en", saved = null;
+  try { saved = window.localStorage.getItem("superconducted-lang"); } catch (e) {}
+  if (saved === "en" || saved === "tr") {
+    pick = saved;
+  } else {
+    var langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""];
+    for (var i = 0; i < langs.length; i++) {
+      var l = String(langs[i]).toLowerCase();
+      if (l === "tr" || l.indexOf("tr-") === 0) { pick = "tr"; break; }
+      if (l === "en" || l.indexOf("en-") === 0) { pick = "en"; break; }
+    }
+  }
+  window.location.replace("{{ "/" | absURL }}" + pick + "/");
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url={{ .Permalink }}"></noscript>
+{{- else }}
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url={{ .Permalink }}">
+{{- end }}
+<style>body{font-family:system-ui,sans-serif;background:#EEF3F5;color:#0A1B24;margin:2rem}a{color:#0A6C7C}@media (prefers-color-scheme:dark){body{background:#0A1B24;color:#EEF3F5}a{color:#4FD6E6}}</style>
+</head>
+<body>
+<p>SuperconducTED: <a href="{{ "/en/" | absURL }}" hreflang="en">English</a> · <a href="{{ "/tr/" | absURL }}" hreflang="tr" lang="tr">Türkçe</a></p>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{{ define "main" }}
+<article class="page wrap notfound">
+  <h1>{{ T "notfound_title" }}</h1>
+  <p>{{ T "notfound_text" }}</p>
+  <p><a class="button primary" href="{{ site.Home.RelPermalink }}">{{ T "notfound_back" }}</a></p>
+  {{- range hugo.Sites }}{{ if ne .Language.Lang site.Language.Lang }}
+  <p lang="{{ .Language.Locale }}"><a href="{{ .Home.RelPermalink }}">{{ .Language.Label }}</a></p>
+  {{- end }}{{ end }}
+</article>
+{{ end }}

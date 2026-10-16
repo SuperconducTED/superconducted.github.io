@@ -1,0 +1,18 @@
+{{ define "main" }}
+<article class="page wrap">
+  <header class="page-head">
+    <h1>{{ .Title }}</h1>
+    {{- with .Params.lead }}<p class="lead">{{ . }}</p>{{ end }}
+  </header>
+  {{- if and .Params.toc (gt (len .Fragments.Headings) 0) }}
+  <nav class="toc" aria-label="{{ T "on_this_page" }}">
+    <p class="toc-title">{{ T "on_this_page" }}</p>
+    {{ .TableOfContents }}
+  </nav>
+  {{- end }}
+  <div class="prose">
+    {{ .Content }}
+  </div>
+  {{- if eq .Layout "team" }}{{ partial "team.html" . }}{{ end }}
+</article>
+{{ end }}
