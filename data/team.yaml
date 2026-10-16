@@ -2,32 +2,33 @@
 # GitHub handles from the collaborators API on 2026-09-07), with Mert's decisions of 2026-10-16:
 # Bengisu by full name, Dr. Akba listed as faculty advisor without a link, former members not
 # listed. Order follows the roster. `owns` lists paths only (they read the same in both languages):
-# the roster's "Primary modules" plus the training/ rows of the module-ownership table.
+# the roster's "Primary modules" plus the training/ rows of the module-ownership table, as of
+# engine PR #118 (2026-10-16), which divided a former member's four modules among the team.
 members:
   - name: "Mert Efe Şensoy"
     github: "mertefesensoy"
     role:
       en: "Computer Science, senior"
       tr: "Bilgisayar Bilimleri, 4. sınıf"
-    owns: ["interfaces.py", "types.py", "training/parameters.py", "training/targets.py", "pyproject.toml", ".github/workflows/ci.yml"]
+    owns: ["interfaces.py", "types.py", "training/parameters.py", "training/targets.py", "pyproject.toml", ".github/workflows/ci.yml", "fuzzy/squashing.py"]
   - name: "Burak Öztekin"
     github: "BurakOztekin"
     role:
       en: "Computer Science and Electrical Engineering, senior"
       tr: "Bilgisayar Bilimleri ve Elektrik-Elektronik Mühendisliği, 4. sınıf"
-    owns: ["fuzzy/tsk.py", "fuzzy/fuzzification.py", "training/anfis.py", "integration/aer_factory.py", "benchmarks/harness.py"]
+    owns: ["fuzzy/tsk.py", "fuzzy/fuzzification.py", "training/anfis.py", "integration/aer_factory.py", "benchmarks/harness.py", "benchmarks/circuits.py"]
   - name: "Baha Jarad"
     github: "BahaJarad"
     role:
       en: "Computer Science and Electrical Engineering, senior"
       tr: "Bilgisayar Bilimleri ve Elektrik-Elektronik Mühendisliği, 4. sınıf"
-    owns: ["calibration/poller.py", "calibration/storage.py", "calibration/features.py"]
+    owns: ["calibration/poller.py", "calibration/storage.py", "calibration/features.py", "fuzzy/parameterization.py"]
   - name: "Bengisu Cıvdı"
     github: "bengisucvd"
     role:
       en: "Mathematics, senior"
       tr: "Matematik, 4. sınıf"
-    owns: ["fuzzy/defuzzification.py", "channels/kraus.py", "benchmarks/metrics.py"]
+    owns: ["fuzzy/defuzzification.py", "channels/kraus.py", "benchmarks/metrics.py", "fuzzy/membership.py"]
 advisor:
   name: "Dr. Fırat Akba"
   role:
