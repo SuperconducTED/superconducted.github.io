@@ -19,14 +19,14 @@ members:
   - name: "Baha Jarad"
     github: "BahaJarad"
     role:
-      en: "Computer Science and Electrical Engineering, junior"
-      tr: "Bilgisayar Bilimleri ve Elektrik-Elektronik Mühendisliği, 3. sınıf"
+      en: "Computer Science and Electrical Engineering, senior"
+      tr: "Bilgisayar Bilimleri ve Elektrik-Elektronik Mühendisliği, 4. sınıf"
     owns: ["calibration/poller.py", "calibration/storage.py", "calibration/features.py"]
   - name: "Bengisu Cıvdı"
     github: "bengisucvd"
     role:
-      en: "Mathematics, junior"
-      tr: "Matematik, 3. sınıf"
+      en: "Mathematics, senior"
+      tr: "Matematik, 4. sınıf"
     owns: ["fuzzy/defuzzification.py", "channels/kraus.py", "benchmarks/metrics.py"]
 advisor:
   name: "Dr. Fırat Akba"
