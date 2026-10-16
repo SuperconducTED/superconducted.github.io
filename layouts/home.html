@@ -68,7 +68,7 @@
     {{- range hugo.Data.facts.facts }}
     {{- if or (not .pending) (not hugo.IsProduction) }}
     <li{{ if .pending }} class="pending"{{ end }}>
-      <p class="fact-value">{{ lang.FormatNumberCustom 0 .value }}{{ with .of }} <span class="fact-of">{{ T "fact_of" }} {{ lang.FormatNumberCustom 0 . }}</span>{{ end }}</p>
+      <p class="fact-value">{{ lang.FormatNumber 0 .value }}{{ with .of }} <span class="fact-of">{{ T "fact_of" }} {{ lang.FormatNumber 0 . }}</span>{{ end }}</p>
       <p class="fact-label">{{ T .label }}</p>
       <p class="fact-source small">
         {{- if .pending }}{{ T "fact_pending" }}{{ else }}<a href="{{ site.Params.register }}">{{ .nc }}</a>{{ end }}

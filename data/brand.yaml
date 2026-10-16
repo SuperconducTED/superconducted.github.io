@@ -1,40 +1,40 @@
 # Written by scripts/sync_brand.py; do not edit by hand.
 source_repo: SuperconducTED/.github
-source_commit: c70c9a9456ad2e2f184e1ed387f4cf2ac877292b
+source_commit: ac5c4fc33c8cf494051a77e4e6076dff1368dacf
 files:
   - path: brand/compact-on-light.svg
-    source: brand/kit/svg/superconducted-compact-on-light.svg
+    source: brand/svg/superconducted-compact-on-light.svg
     sha256: ca13800bc465e6e882ea20aa6ecf288a612d4bcfca61789b866362265d40d784
   - path: brand/compact-on-dark.svg
-    source: brand/kit/svg/superconducted-compact-on-dark.svg
+    source: brand/svg/superconducted-compact-on-dark.svg
     sha256: 75c77dabb53ee70c7d598731ab758e8cd29daf8f0de00589dd17f580f0eed31b
   - path: brand/mark-on-light.svg
-    source: brand/kit/svg/superconducted-mark-on-light.svg
+    source: brand/svg/superconducted-mark-on-light.svg
     sha256: dc6d512402d08773e6b9b7f5e5fb67766b817e1d4f6c2f91af3effda616c403a
   - path: brand/mark-on-dark.svg
-    source: brand/kit/svg/superconducted-mark-on-dark.svg
+    source: brand/svg/superconducted-mark-on-dark.svg
     sha256: 3fffc18a26e487c26172904218da2ca1d9f765cc63ff05a434d0be02380adc54
   - path: favicon.svg
-    source: brand/kit/web/favicon.svg
+    source: brand/web/favicon.svg
     sha256: 3cf583c1decdd1a2ed2d7087d6958df576e0a9cec2607c42958c72ffbe0cb803
   - path: favicon-16.png
-    source: brand/kit/web/favicon-16.png
+    source: brand/web/favicon-16.png
     sha256: c3535616ebb23820993c77ff15bee5d366544338c4b84b7bff12f9de83b18b76
   - path: favicon-32.png
-    source: brand/kit/web/favicon-32.png
+    source: brand/web/favicon-32.png
     sha256: 54c5ce93c8b97ee70850b40a14c42498605f3475d1544f4a19b6c8fff81cd461
   - path: favicon-48.png
-    source: brand/kit/web/favicon-48.png
+    source: brand/web/favicon-48.png
     sha256: 71b0897970f7674bf804310f2553f63afbf84d107297cd27fa301a14bf9ffa65
   - path: apple-touch-icon.png
-    source: brand/kit/web/app-icon-180.png
+    source: brand/web/app-icon-180.png
     sha256: 123ba15b42de8037a18af37c244e9639c13d0ebb29e9bcfe5ffea80aaae11c5a
   - path: app-icon-192.png
-    source: brand/kit/web/app-icon-192.png
+    source: brand/web/app-icon-192.png
     sha256: f0833156c8227ea5f428b508aa4a10673288de3272dff4fa0c8126c6f618d08d
   - path: app-icon-512.png
-    source: brand/kit/web/app-icon-512.png
+    source: brand/web/app-icon-512.png
     sha256: d6c78de4c39097bb2e8d4445354d65dbf139f93b578c1466a974617c44bcb8c3
   - path: social-card.png
-    source: brand/kit/web/social-card-noise-engine.png
+    source: brand/web/social-card-noise-engine.png
     sha256: dbb9df5e123d6337822d48a6c5092e71cdcd5f3c808dde4716731454ba199263
