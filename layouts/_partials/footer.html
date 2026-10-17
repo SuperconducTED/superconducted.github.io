@@ -1,19 +1,43 @@
 <footer class="site-footer">
-  <div class="wrap footer-grid">
-    <div>
-      <p class="footer-tagline" lang="en">{{ T "footer_tagline" }}</p>
-      <p class="small">{{ T "footer_licence" }}</p>
-      <p class="small">{{ T "footer_ibm" }}</p>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="{{ site.Home.RelPermalink }}" aria-label="{{ T "home" }}">{{ partial "brand-img.html" (dict "name" "compact" "w" 249 "h" 40) }}</a>
+        <p class="footer-tagline" lang="en">{{ T "footer_tagline" }}</p>
+      </div>
+      <nav class="footer-col" aria-labelledby="footer-project">
+        <h2 id="footer-project">{{ T "footer_project" }}</h2>
+        <ul>
+          {{- range site.Menus.main }}
+          <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-labelledby="footer-code">
+        <h2 id="footer-code">{{ T "footer_code" }}</h2>
+        <ul>
+          <li><a href="{{ site.Params.repo }}">{{ T "footer_repo" }}</a></li>
+          <li><a href="{{ site.Params.engineDiscussions }}">{{ T "footer_discussions" }}</a></li>
+          <li><a href="{{ site.Params.engineIssues }}">{{ T "footer_issues" }}</a></li>
+          <li><a href="{{ site.Params.siteRepo }}">{{ T "footer_site" }}</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-labelledby="footer-more">
+        <h2 id="footer-more">{{ T "footer_more" }}</h2>
+        <ul>
+          <li><a href="{{ site.Params.org }}">{{ T "footer_org" }}</a></li>
+          <li><a href="{{ site.Params.register }}">{{ T "footer_register" }}</a></li>
+          <li><a href="{{ site.Params.brandGuide }}">{{ T "footer_brand" }}</a></li>
+          {{- with site.GetPage "/updates" }}{{ with .OutputFormats.Get "atom" }}
+          <li><a href="{{ .RelPermalink }}" type="application/atom+xml">{{ T "footer_feed" }}</a></li>
+          {{- end }}{{ end }}
+        </ul>
+      </nav>
     </div>
-    <nav aria-label="{{ T "footer_links" }}">
-      <ul class="footer-links">
-        <li><a href="{{ site.Params.org }}">{{ T "footer_org" }}</a></li>
-        <li><a href="{{ site.Params.repo }}">{{ T "footer_repo" }}</a></li>
-        <li><a href="{{ site.Params.repo }}/discussions">{{ T "footer_discussions" }}</a></li>
-        <li><a href="{{ site.Params.repo }}/issues">{{ T "footer_issues" }}</a></li>
-        <li><a href="{{ site.Params.brandGuide }}">{{ T "footer_brand" }}</a></li>
-        <li><a href="{{ site.Params.siteRepo }}">{{ T "footer_site" }}</a></li>
-      </ul>
-    </nav>
+    <div class="footer-bottom small">
+      <p>{{ T "footer_privacy" }}</p>
+      <p>{{ T "footer_licence" }}</p>
+      <p>{{ T "footer_ibm" }}</p>
+    </div>
   </div>
 </footer>

@@ -1,0 +1,42 @@
+{{- /* "Get updates" box: Buttondown email sign-up plus the Atom feed and GitHub.
+Buttondown documents its embed endpoint as the action of a standard HTML form, never fetch(),
+because a subscriber may have to pass a CAPTCHA or fix an address on its page; so the form
+posts to a new tab and this page shows what happens next. Buttondown sends a confirmation link
+before an address is subscribed (double opt-in), which is the address check. No secret is
+involved: the endpoint takes the public username from params.newsletter.buttondown. While that
+is empty the form is not rendered (and the CSP keeps form-action 'none').
+assets/js/newsletter.js validates the address before it leaves the page and shows the done
+state; without script the browser's own validation runs and Buttondown's page takes over. */ -}}
+{{- $user := site.Params.newsletter.buttondown }}
+<div class="signup inverse" id="get-updates">
+  <p class="kicker">{{ T "signup_kicker" }}</p>
+  <h3>{{ T "signup_title" }}</h3>
+  {{- if $user }}
+  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ $user | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}">
+    <p>{{ T "signup_text" }}</p>
+    <div class="field">
+      <label for="signup-email">{{ T "signup_label" }}</label>
+      <div class="field-row">
+        <input class="input" type="email" id="signup-email" name="email" required maxlength="254" autocomplete="email" inputmode="email" spellcheck="false" placeholder="{{ T "signup_placeholder" }}" aria-describedby="signup-error signup-fine">
+        <input type="hidden" name="embed" value="1">
+        <button class="button primary" type="submit">{{ T "signup_button" }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</button>
+      </div>
+      <p class="field-error" id="signup-error" aria-live="polite"></p>
+    </div>
+    <p class="fineprint" id="signup-fine">{{ T "signup_fine" }}</p>
+  </form>
+  <div class="signup-done" role="status" aria-live="polite" tabindex="-1">
+    <span class="done-mark">{{ partial "icon.html" "check" }}</span>
+    <p><strong>{{ T "signup_done_title" }}</strong> {{ T "signup_done_text" }}</p>
+  </div>
+  {{- else }}
+  <p>{{ T "signup_off_text" }}</p>
+  {{- if not hugo.IsProduction }}<p class="fineprint">[dev] params.newsletter.buttondown is empty, so the email form is hidden.</p>{{ end }}
+  {{- end }}
+  <ul class="feed-links">
+    {{- with site.GetPage "/updates" }}{{ with .OutputFormats.Get "atom" }}
+    <li><a href="{{ .RelPermalink }}" type="application/atom+xml">{{ partial "icon.html" "feed" }}{{ T "signup_feed" }}</a></li>
+    {{- end }}{{ end }}
+    <li><a href="{{ site.Params.repo }}">{{ partial "icon.html" "eye" }}{{ T "signup_watch" }}</a></li>
+  </ul>
+</div>

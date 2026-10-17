@@ -1,0 +1,17 @@
+{{- /* Floating buttons, bottom right. Back to top needs script (it appears after one screen of
+scrolling). The contact button opens a native popover, which works without script: questions go
+to the engine's Discussions, bugs to its issues (no email address on the site, owner decision of
+2026-10-16). */ -}}
+<div class="fab-stack">
+  <a class="fab to-top needs-js" href="#top" aria-label="{{ T "to_top" }}" title="{{ T "to_top" }}">{{ partial "icon.html" "arrow-up" }}</a>
+  <button class="fab contact" type="button" popovertarget="contact-menu" aria-label="{{ T "contact_open" }}">
+    {{- partial "icon.html" "chat" }}<span class="fab-label" aria-hidden="true">{{ T "contact_label" }}</span>
+  </button>
+</div>
+<div class="contact-menu" id="contact-menu" popover aria-label="{{ T "contact_open" }}">
+  <p>{{ T "contact_intro" }}</p>
+  <ul>
+    <li><a href="{{ site.Params.engineDiscussions }}">{{ partial "icon.html" "chat" }}<strong>{{ T "contact_question" }}</strong><span>{{ T "contact_question_note" }}</span></a></li>
+    <li><a href="{{ site.Params.engineIssues }}">{{ partial "icon.html" "bug" }}<strong>{{ T "contact_bug" }}</strong><span>{{ T "contact_bug_note" }}</span></a></li>
+  </ul>
+</div>

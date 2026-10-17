@@ -1,18 +1,36 @@
 {{ define "main" }}
+{{- /* Inner pages. With `toc: true` in front matter a contents rail lists the h2 sections; it is
+sticky beside the text on wide screens and a collapsible list above it on narrow ones
+(assets/js/site.js closes it there and marks the section in view). */ -}}
+{{- $heads := slice }}
+{{- if .Params.toc }}
+{{- range findRESubmatch `<h2 id="([^"]+)"[^>]*>(.*?)</h2>` .Content }}
+{{- $heads = $heads | append (dict "id" (index . 1) "title" (index . 2 | plainify | htmlUnescape)) }}
+{{- end }}
+{{- end }}
 <article class="page wrap">
   <header class="page-head">
+    {{- with .Params.kicker }}<p class="kicker">{{ . }}</p>{{ end }}
     <h1>{{ .Title }}</h1>
-    {{- with .Params.lead }}<p class="lead">{{ . }}</p>{{ end }}
+    {{- with .Params.lead }}<p class="lead">{{ partial "fmt.html" (dict "page" $ "text" .) }}</p>{{ end }}
   </header>
-  {{- if and .Params.toc (gt (len .Fragments.Headings) 0) }}
-  <nav class="toc" aria-label="{{ T "on_this_page" }}">
-    <p class="toc-title">{{ T "on_this_page" }}</p>
-    {{ .TableOfContents }}
-  </nav>
-  {{- end }}
-  <div class="prose">
-    {{ .Content }}
+  <div class="page-grid{{ if $heads }} has-toc{{ end }}">
+    {{- with $heads }}
+    <nav class="toc" aria-label="{{ T "on_this_page" }}">
+      <details open>
+        <summary>{{ T "on_this_page" }}</summary>
+        <ul>
+          {{- range . }}<li><a href="#{{ .id }}">{{ .title }}</a></li>{{ end }}
+        </ul>
+      </details>
+    </nav>
+    {{- end }}
+    <div>
+      <div class="prose">
+        {{ .Content }}
+      </div>
+      {{- if eq .Layout "team" }}{{ partial "team.html" . }}{{ end }}
+    </div>
   </div>
-  {{- if eq .Layout "team" }}{{ partial "team.html" . }}{{ end }}
 </article>
 {{ end }}

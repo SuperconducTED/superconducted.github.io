@@ -1,25 +1,39 @@
-<header class="site-header">
+{{- /* Sticky header. Order in the markup is the visual order on wide screens (brand, nav with the
+call to action, search, language, theme), so keyboard focus follows what the eye sees. Below
+60rem the nav becomes the Menu panel; the language link and theme control are repeated inside
+it (only one copy is ever displayed). Without script the nav stays a plain list. */ -}}
+{{- $current := . }}
+<header class="site-header" id="top">
   <div class="wrap header-row">
     <a class="brand" href="{{ site.Home.RelPermalink }}" aria-label="{{ T "home" }}">
-      <img class="on-light" src="{{ "brand/compact-on-light.svg" | absURL }}" alt="" width="249" height="40">
-      <img class="on-dark" src="{{ "brand/compact-on-dark.svg" | absURL }}" alt="" width="249" height="40">
+      {{- partial "brand-img.html" (dict "name" "compact" "w" 249 "h" 40) }}
     </a>
-    <nav class="site-nav" aria-label="{{ T "menu" }}">
-      <ul>
-        {{- $current := . }}
+    <nav class="site-nav" id="site-nav" aria-label="{{ T "menu" }}">
+      <ul class="nav-list">
         {{- range site.Menus.main }}
-        {{- $active := and .Page (eq .Page.RelPermalink $current.RelPermalink) }}
-        <li><a href="{{ .URL }}"{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- $active := and .Page (or (eq .Page.RelPermalink $current.RelPermalink) (and $current.IsPage (eq .Page.Section $current.Section) (ne .Page.Section ""))) }}
+        {{- if .Params.cta }}
+        <li class="nav-cta"><a class="button primary small" href="{{ .URL }}"{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- else }}
+        <li><a class="nav-link" href="{{ .URL }}"{{ if $active }} aria-current="page"{{ end }}>{{ .Name }}</a></li>
+        {{- end }}
         {{- end }}
       </ul>
+      <div class="nav-extra needs-js">
+        {{- partial "lang-switch.html" . }}
+        {{- partial "theme-switch.html" . }}
+      </div>
     </nav>
     <div class="header-tools">
-      {{- range .Translations }}
-      <a class="lang" href="{{ .RelPermalink }}" hreflang="{{ .Language.Locale }}" lang="{{ .Language.Locale }}" data-lang="{{ .Language.Lang }}">{{ .Language.Label }}</a>
-      {{- end }}
-      <button class="theme-toggle" type="button" aria-label="{{ T "theme_toggle" }}" data-label-light="{{ T "theme_light" }}" data-label-dark="{{ T "theme_dark" }}">
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+      <button class="icon-button search-open needs-js" type="button" data-search-open aria-haspopup="dialog" aria-label="{{ T "search_open" }}" aria-keyshortcuts="/ Control+K Meta+K">
+        {{- partial "icon.html" "search" }}<span class="search-label" aria-hidden="true">{{ T "search" }}</span><kbd aria-hidden="true">/</kbd>
+      </button>
+      {{- partial "lang-switch.html" . }}
+      {{- partial "theme-switch.html" . }}
+      <button class="icon-button menu-toggle needs-js" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="{{ T "menu_open" }}" data-label-open="{{ T "menu_open" }}" data-label-close="{{ T "menu_close" }}">
+        {{- partial "icon.html" (dict "name" "menu" "class" "icon-open") }}{{ partial "icon.html" (dict "name" "close" "class" "icon-close") }}
       </button>
     </div>
   </div>
+  <div class="progress" aria-hidden="true"></div>
 </header>

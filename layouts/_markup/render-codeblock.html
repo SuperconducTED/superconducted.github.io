@@ -1,0 +1,10 @@
+{{- /* Fenced code: highlighted with CSS classes (hugo.toml noClasses = false; colours in site.css),
+inside a panel with the language and a Copy button. The button is hidden without script
+(.needs-js); assets/js/site.js copies the block's text and announces "Copied". */ -}}
+{{- $lang := .Type | default "text" }}
+{{- $result := transform.HighlightCodeBlock . }}
+<div class="code-block">
+  <div class="code-head"><span>{{ $lang }}</span><button class="copy needs-js" type="button" aria-label="{{ T "copy_label" }}" data-copied="{{ T "copied" }}">{{ partial "icon.html" (dict "name" "copy" "class" "icon-copy") }}{{ partial "icon.html" (dict "name" "check" "class" "icon-check") }}<span class="copy-text" aria-hidden="true">{{ T "copy" }}</span></button></div>
+  {{ $result.Wrapped }}
+  <span class="visually-hidden copy-status" aria-live="polite"></span>
+</div>

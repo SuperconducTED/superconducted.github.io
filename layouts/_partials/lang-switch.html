@@ -1,0 +1,5 @@
+{{- /* Link to this page in the other language. A click saves the choice (assets/js/site.js) so the
+root page sends a returning visitor straight to it. */ -}}
+{{- range .Translations }}
+<a class="lang" href="{{ .RelPermalink }}" hreflang="{{ .Language.Locale }}" lang="{{ .Language.Locale }}" data-lang="{{ .Language.Lang }}">{{ .Language.Label }}</a>
+{{- end }}

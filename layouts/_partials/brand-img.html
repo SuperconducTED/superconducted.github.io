@@ -1,0 +1,11 @@
+{{- /* The on-light and on-dark versions of one brand file, as minified, fingerprinted copies of
+the kit files in static/brand/ (mounted into assets/ by hugo.toml; the originals stay byte for
+byte as recorded in data/brand.yaml). CSS shows the one that matches the theme; with
+loading="lazy" a hidden image is never fetched. "eager" is for the header logo, which is
+always on screen: lazy loading would only delay it.
+  name: "compact" or "mark"   w, h: intrinsic size   eager: optional bool */ -}}
+{{- $loading := cond (.eager | default false) "eager" "lazy" }}
+{{- range slice "light" "dark" }}
+{{- $r := resources.Get (printf "brand/%s-on-%s.svg" $.name .) | minify | fingerprint }}
+<img class="on-{{ . }}" src="{{ $r.RelPermalink }}" alt="" width="{{ $.w }}" height="{{ $.h }}" loading="{{ $loading }}" decoding="async">
+{{- end }}

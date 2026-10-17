@@ -1,7 +1,8 @@
 ---
 title: "Ekip"
+kicker: "İnsanlar"
 description: "SuperconducTED'i Ankara'daki TED Üniversitesi'nde geliştiren öğrenciler ve danışman öğretim üyesi."
-lead: "SuperconducTED, Ankara'daki TED Üniversitesi'nde lisans öğrencileri tarafından, bir danışman öğretim üyesiyle birlikte geliştiriliyor. Her öğrenci motorun bazı bölümlerinden sorumludur ve diğerlerinin çalışmalarını inceler."
+lead: "Motoru Ankara'daki TED Üniversitesi'nden dört son sınıf öğrencisi, bir danışman öğretim üyesiyle birlikte geliştiriyor. Her öğrenci bazı modüllerden sorumludur ve diğerlerinin çalışmalarını inceler; böylece her değişikliğe ikinci bir göz bakar."
 layout: team
 ---
 

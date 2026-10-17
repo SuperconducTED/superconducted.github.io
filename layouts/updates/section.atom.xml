@@ -1,0 +1,29 @@
+{{- /* Atom 1.0 feed of the Updates section, one per language: /<lang>/updates/atom.xml.
+Newest 20 posts, full content (XML-escaped HTML). */ -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\"?>" | safeHTML }}
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ site.Language.Locale }}">
+  <title>{{ T "feed_title" }}</title>
+  <subtitle>{{ T "feed_subtitle" }}</subtitle>
+  <link href="{{ (.OutputFormats.Get "atom").Permalink }}" rel="self" type="application/atom+xml"/>
+  <link href="{{ .Permalink }}" rel="alternate" type="text/html"/>
+  <id>{{ .Permalink }}</id>
+  {{- with .RegularPages }}
+  <updated>{{ (index . 0).Lastmod.UTC.Format "2006-01-02T15:04:05Z" }}</updated>
+  {{- else }}
+  <updated>{{ now.UTC.Format "2006-01-02T15:04:05Z" }}</updated>
+  {{- end }}
+  <author><name>SuperconducTED contributors</name><uri>{{ site.Params.org }}</uri></author>
+  <rights>CC BY 4.0</rights>
+  <icon>{{ "favicon-48.png" | absURL }}</icon>
+  {{- range first 20 .RegularPages }}
+  <entry>
+    <title>{{ .Title }}</title>
+    <link href="{{ .Permalink }}" rel="alternate" type="text/html"/>
+    <id>{{ .Permalink }}</id>
+    <published>{{ .Date.UTC.Format "2006-01-02T15:04:05Z" }}</published>
+    <updated>{{ .Lastmod.UTC.Format "2006-01-02T15:04:05Z" }}</updated>
+    <summary>{{ .Description | default (.Summary | plainify) }}</summary>
+    <content type="html">{{ .Content | transform.XMLEscape | safeHTML }}</content>
+  </entry>
+  {{- end }}
+</feed>

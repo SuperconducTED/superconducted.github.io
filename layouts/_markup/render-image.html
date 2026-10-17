@@ -1,0 +1,17 @@
+{{- /* Images in Markdown: lazy, async, sized. A page-bundle or assets/ image in PNG or JPEG is
+re-encoded to WebP (quality 78) and capped at 1400 px wide, so posts never ship an
+uncompressed original. Anything else is used as it is, still lazy. */ -}}
+{{- $u := urls.Parse .Destination }}
+{{- $img := "" }}
+{{- if not $u.IsAbs }}{{ $img = or (.PageInner.Resources.Get $u.Path) (resources.Get $u.Path) }}{{ end }}
+{{- with $img }}
+  {{- if in (slice "image/png" "image/jpeg") .MediaType.Type }}
+    {{- $spec := cond (gt .Width 1400) "resize 1400x webp q78" "webp q78" }}
+    {{- $r := .Process $spec }}
+<img src="{{ $r.RelPermalink }}" width="{{ $r.Width }}" height="{{ $r.Height }}" alt="{{ $.PlainText }}" loading="lazy" decoding="async"{{ with $.Title }} title="{{ . }}"{{ end }}>
+  {{- else }}
+<img src="{{ .RelPermalink }}" alt="{{ $.PlainText }}" loading="lazy" decoding="async"{{ with $.Title }} title="{{ . }}"{{ end }}>
+  {{- end }}
+{{- else }}
+<img src="{{ .Destination }}" alt="{{ .PlainText }}" loading="lazy" decoding="async"{{ with .Title }} title="{{ . }}"{{ end }}>
+{{- end -}}

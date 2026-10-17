@@ -1,0 +1,7 @@
+{{- /* Links in Markdown. The destination is printed without safeURL, so html/template's URL
+filter still refuses javascript: and similar schemes. A link whose whole text is an evidence id
+(a register row NC-012, a decision ADR-009, a pull request PR #114 or an issue #60) is drawn as
+a proof chip next to the claim it supports. */ -}}
+{{- $proof := findRE `^(NC-\d{3}|ADR-\d{3}|PR #\d+|#\d+)$` (.Text | plainify | htmlUnescape) -}}
+<a href="{{ .Destination }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $proof }} class="proof"{{ end }}>{{ .Text }}</a>
+{{- /* no trailing newline */ -}}

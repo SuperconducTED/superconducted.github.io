@@ -1,0 +1,11 @@
+{{- /* Render a front-matter string as Markdown after expanding {claim:KEY} tokens (see
+claims-map.html). An unknown key fails the build, so a typo cannot ship a raw token.
+Context: dict "page" <page> "text" <string> ["block" true for paragraphs, default inline]. */ -}}
+{{- $t := .text | default "" }}
+{{- $map := partialCached "claims-map.html" . site.Language.Lang }}
+{{- range findRESubmatch `\{claim:([a-z_]+)\}` $t }}
+{{- $key := index . 1 }}
+{{- with index $map $key }}{{ $t = replace $t (printf "{claim:%s}" $key) . }}{{ else }}{{ errorf "fmt.html: unknown claim %q in %s" $key $.page.File.Path }}{{ end }}
+{{- end }}
+{{- $out := cond (.block | default false) (.page.RenderString (dict "display" "block") $t) (.page.RenderString $t) }}
+{{- return $out }}

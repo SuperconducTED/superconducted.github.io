@@ -1,24 +1,39 @@
 {{- $lang := site.Language.Lang }}
 {{- with hugo.Data.team }}
-<section aria-labelledby="team-members">
+<section class="team-block" aria-labelledby="team-members">
   <h2 id="team-members">{{ T "team_members" }}</h2>
   <ul class="people">
     {{- range .members }}
-    <li class="person">
-      <h3>{{ .name }}</h3>
-      <p class="role">{{ index .role $lang }}</p>
-      <p class="owns"><span class="owns-label">{{ T "team_owns" }}:</span>
-        {{- range $i, $m := .owns }}{{ if $i }},{{ end }} <code>{{ $m }}</code>{{ end }}</p>
-      <p><a href="https://github.com/{{ .github }}" aria-label="{{ T "team_profile" }} {{ .name }}">@{{ .github }}</a></p>
+    {{- $parts := split .name " " }}
+    {{- $initials := printf "%s%s" (substr (index $parts 0) 0 1) (substr (index $parts (sub (len $parts) 1)) 0 1) }}
+    <li class="person card">
+      <div class="person-top">
+        <span class="monogram" aria-hidden="true">{{ $initials }}</span>
+        <div>
+          <h3>{{ .name }}</h3>
+          <p class="role">{{ index .role $lang }}</p>
+        </div>
+      </div>
+      <div class="owns"><span>{{ T "team_owns" }}</span>
+        <ul>{{ range .owns }}<li><code>{{ . }}</code></li>{{ end }}</ul>
+      </div>
+      <a class="person-link" href="https://github.com/{{ .github }}">{{ partial "icon.html" "github" }}<span>@{{ .github }}</span><span class="visually-hidden"> ({{ T "team_profile" }} {{ .name }})</span></a>
     </li>
     {{- end }}
   </ul>
 </section>
-<section aria-labelledby="team-advisor">
+<section class="team-block" aria-labelledby="team-advisor">
   <h2 id="team-advisor">{{ T "team_advisor" }}</h2>
   <ul class="people">
-    <li class="person">
-      <h3>{{ .advisor.name }}</h3>
+    {{- $parts := split .advisor.name " " }}
+    <li class="person card">
+      <div class="person-top">
+        <span class="monogram" aria-hidden="true">{{ substr (index $parts 1) 0 1 }}{{ substr (index $parts (sub (len $parts) 1)) 0 1 }}</span>
+        <div>
+          <h3>{{ .advisor.name }}</h3>
+          <p class="role">{{ index .advisor.role $lang }}</p>
+        </div>
+      </div>
     </li>
   </ul>
 </section>

@@ -1,0 +1,27 @@
+{{- /* The search index for this language: /<lang>/search.json, fetched once by
+assets/js/search.js on the first search. One record per page:
+  t title, u URL, s section label, d description, h h2 headings, b plain body text.
+Math is dropped from the body ($$...$$ and \(...\)), since rendered KaTeX reads as noise.
+Home's text lives in front matter, so its record is assembled from the hero, steps and FAQ. */ -}}
+{{- $out := slice }}
+{{- $p := site.Home.Params }}
+{{- $homeText := slice $p.hero.sub $p.problem.intro $p.approach.intro $p.status.intro }}
+{{- range $p.problem.steps }}{{ $homeText = $homeText | append .title .text }}{{ end }}
+{{- range $p.approach.points }}{{ $homeText = $homeText | append .title .text }}{{ end }}
+{{- range $p.faq.items }}{{ $homeText = $homeText | append .q .a }}{{ end }}
+{{- $out = $out | append (dict
+  "t" (printf "%s %s %s" $p.hero.title_before $p.hero.title_range $p.hero.title_after)
+  "u" site.Home.RelPermalink "s" (T "search_section_home") "d" site.Home.Description
+  "h" (slice $p.problem.title $p.approach.title $p.status.title $p.faq.title)
+  "b" (partial "fmt.html" (dict "page" site.Home "text" (delimit $homeText " ")) | plainify | htmlUnescape)) }}
+{{- $pages := site.RegularPages }}
+{{- with site.GetPage "/updates" }}{{ $pages = $pages | append . }}{{ end }}
+{{- range $pages }}
+{{- $heads := slice }}
+{{- range findRESubmatch `<h2 id="[^"]*"[^>]*>(.*?)</h2>` .Content }}{{ $heads = $heads | append (index . 1 | plainify | htmlUnescape) }}{{ end }}
+{{- $raw := .RawContent | replaceRE `(?s)\$\$.*?\$\$` " " | replaceRE `(?s)\\\(.*?\\\)` " " }}
+{{- $body := .RenderString (dict "display" "block") $raw | plainify | htmlUnescape | replaceRE `\s+` " " }}
+{{- $label := cond (eq .Section "updates") (T "search_section_updates") (T "search_section_page") }}
+{{- $out = $out | append (dict "t" .Title "u" .RelPermalink "s" $label "d" .Description "h" $heads "b" (strings.TrimSpace $body)) }}
+{{- end }}
+{{- jsonify $out }}
