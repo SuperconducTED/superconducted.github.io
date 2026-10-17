@@ -25,11 +25,12 @@ Checks:
   contrast   the CSS colour tokens meet WCAG 2.x: 4.5:1 for text roles on the ground, surface
              and raised roles, 3:1 for the band edge on the band, in light and dark; the two dark
              token blocks are identical
-  csp        every page carries a CSP with script-src 'self' (no 'unsafe-inline' or
-             'unsafe-eval'), object-src 'none', base-uri 'self' and Trusted Types; a page whose
-             style-src lacks 'unsafe-inline' has no style attribute or <style> element; no page
-             has an inline event handler or an inline executable script; target="_blank" links
-             and forms carry rel="noopener"
+  csp        every page carries a CSP with script-src 'self' plus only sha256 hashes (no
+             'unsafe-inline' or 'unsafe-eval'), object-src 'none', base-uri 'self' and Trusted
+             Types; every inline executable script's SHA-256 is listed in its page's script-src;
+             a page whose style-src lacks 'unsafe-inline' has no style attribute or <style>
+             element; no page has an inline event handler; target="_blank" links and forms carry
+             rel="noopener"
   scripts    the shipped scripts (assets/js) use no HTML-string sinks (innerHTML, outerHTML,
              insertAdjacentHTML, document.write, eval, new Function), no console logging, and
              write only the two preference keys to local storage
@@ -43,6 +44,7 @@ Checks:
   root       the root page and the root 404 page exist
 """
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -124,7 +126,7 @@ class Page(HTMLParser):
         self.fact_values = 0
         self.style_attrs = 0
         self.style_elements = 0
-        self.inline_scripts = 0
+        self.inline_scripts = []  # bodies of inline executable scripts
         self.handlers = []
         self.blank_without_noopener = []
         self._in_title = False
@@ -152,7 +154,8 @@ class Page(HTMLParser):
             if a.get("src"):
                 self.scripts.append(a["src"])
             elif (a.get("type") or "").lower() not in ("application/json", "application/ld+json"):
-                self.inline_scripts += 1
+                self._in_script = True
+                self.inline_scripts.append("")
         if tag == "style":
             self.style_elements += 1
         if "style" in a:
@@ -174,10 +177,15 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "title":
             self._in_title = False
+        if tag == "script":
+            self._in_script = False
 
     def handle_data(self, data):
         if self._in_title and data.strip():
             self.title = True
+        if self._in_script:
+            self.inline_scripts[-1] += data
+            return
         self.text.append(data)
 
 
@@ -291,8 +299,9 @@ def check_csp(rel, page, production):
         return
     d = directives(page.csp)
     script = d.get("script-src", [])
-    if script != ["'self'"]:
-        fail("csp", f"{rel}: script-src is {' '.join(script)!r}, expected 'self' only")
+    hashes = [t for t in script if re.fullmatch(r"'sha256-[A-Za-z0-9+/]+=*'", t)]
+    if not script or script[0] != "'self'" or len(script) != 1 + len(hashes):
+        fail("csp", f"{rel}: script-src is {' '.join(script)!r}, expected 'self' plus sha256 hashes only")
     if d.get("object-src") != ["'none'"]:
         fail("csp", f"{rel}: object-src is not 'none'")
     if d.get("base-uri") != ["'self'"]:
@@ -306,8 +315,10 @@ def check_csp(rel, page, production):
             fail("csp", f"{rel}: {page.style_attrs} style attribute(s) that its CSP blocks")
         if page.style_elements:
             fail("csp", f"{rel}: {page.style_elements} <style> element(s) that its CSP blocks")
-    if page.inline_scripts:
-        fail("csp", f"{rel}: {page.inline_scripts} inline executable script(s)")
+    for body in page.inline_scripts:
+        digest = base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest()).decode()
+        if f"'sha256-{digest}'" not in hashes:
+            fail("csp", f"{rel}: an inline script's sha256-{digest} is not in its script-src, so browsers block it")
     if page.handlers:
         fail("csp", f"{rel}: inline event handlers {', '.join(page.handlers[:3])}")
     if page.blank_without_noopener:

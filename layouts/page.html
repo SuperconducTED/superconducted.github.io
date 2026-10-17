@@ -1,7 +1,9 @@
 {{ define "main" }}
 {{- /* Inner pages. With `toc: true` in front matter a contents rail lists the h2 sections; it is
-sticky beside the text on wide screens and a collapsible list above it on narrow ones
-(assets/js/site.js closes it there and marks the section in view). */ -}}
+sticky beside the text on wide screens and a collapsible list above it on narrow ones. It is
+closed in the markup and assets/js/site.js opens it on wide screens, where it sits in its own
+column: opening it there moves nothing, while closing it after load on a phone would shift the
+whole page (Lighthouse measured a 0.10 layout shift). site.js also marks the section in view. */ -}}
 {{- $heads := slice }}
 {{- if .Params.toc }}
 {{- range findRESubmatch `<h2 id="([^"]+)"[^>]*>(.*?)</h2>` .Content }}
@@ -17,7 +19,7 @@ sticky beside the text on wide screens and a collapsible list above it on narrow
   <div class="page-grid{{ if $heads }} has-toc{{ end }}">
     {{- with $heads }}
     <nav class="toc" aria-label="{{ T "on_this_page" }}">
-      <details open>
+      <details>
         <summary>{{ T "on_this_page" }}</summary>
         <ul>
           {{- range . }}<li><a href="#{{ .id }}">{{ .title }}</a></li>{{ end }}

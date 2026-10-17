@@ -10,7 +10,7 @@ state; without script the browser's own validation runs and Buttondown's page ta
 {{- $user := site.Params.newsletter.buttondown }}
 <div class="signup inverse" id="get-updates">
   <p class="kicker">{{ T "signup_kicker" }}</p>
-  <h3>{{ T "signup_title" }}</h3>
+  <h2 class="signup-title">{{ T "signup_title" }}</h2>
   {{- if $user }}
   <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ $user | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}">
     <p>{{ T "signup_text" }}</p>

@@ -9,12 +9,15 @@
   * Trusted Types (production): no script may turn a string into HTML or a script URL, except
     through the one policy "sc-loader", which assets/js/site.js uses to load the search script
     and which accepts only that fingerprinted file. Live reload is development-only, so the
-    rule is production-only too. */ -}}
+    rule is production-only too.
+  * The 200-byte theme boot script runs inline, before first paint, allowed by its SHA-256 hash
+    rather than 'unsafe-inline' (an external file cost a render-blocking round trip). */ -}}
+{{- $boot := resources.Get "js/theme-boot.js" | minify | fingerprint "sha256" }}
 {{- $style := cond (.Params.math | default false) "'self' 'unsafe-inline'" "'self'" }}
 {{- $connect := cond hugo.IsDevelopment "'self' ws://localhost:1313" "'self'" }}
 {{- $form := cond (gt (len site.Params.newsletter.buttondown) 0) "https://buttondown.com" "'none'" }}
 {{- $tt := cond hugo.IsProduction "; require-trusted-types-for 'script'; trusted-types sc-loader" "" }}
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src {{ $style | safeHTMLAttr }}; font-src 'self'; script-src 'self'; connect-src {{ $connect | safeHTMLAttr }}; base-uri 'self'; form-action {{ $form | safeHTMLAttr }}; object-src 'none'{{ $tt | safeHTMLAttr }}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src {{ $style | safeHTMLAttr }}; font-src 'self'; script-src 'self' '{{ $boot.Data.Integrity }}'; connect-src {{ $connect | safeHTMLAttr }}; base-uri 'self'; form-action {{ $form | safeHTMLAttr }}; object-src 'none'{{ $tt | safeHTMLAttr }}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 {{- $title := cond .IsHome (printf "SuperconducTED: %s" site.Params.tagline) (printf "%s · SuperconducTED" .Title) }}
 <title>{{ $title }}</title>
@@ -57,5 +60,4 @@
 {{- end }}
 {{- $css := resources.Get "css/site.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
-{{- $boot := resources.Get "js/theme-boot.js" | minify | fingerprint }}
-<script src="{{ $boot.RelPermalink }}" integrity="{{ $boot.Data.Integrity }}"></script>
+<script>{{ $boot.Content | safeJS }}</script>

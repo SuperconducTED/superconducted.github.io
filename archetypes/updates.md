@@ -1,5 +1,5 @@
 ---
-# A new update: hugo new content updates/YYYY-MM-DD-short-slug.md, then write its Turkish twin
+# A new update: hugo new content content/en/updates/YYYY-MM-DD-short-slug.md, then write its Turkish twin
 # at content/tr/updates/ with the same file name, in the same pull request.
 # Voice: a specific title; one idea per section, at most three bullets each; put the evidence
 # (a PR, an issue, or a register figure with the claim shortcode, for example

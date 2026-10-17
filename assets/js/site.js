@@ -8,7 +8,7 @@
 //   menu       mobile nav panel: toggle, Escape, outside click, link click; focus returns
 //   progress   reading progress bar, only where CSS scroll timelines are missing
 //   to top     back-to-top button after one screen; moves focus to the top of main
-//   toc        marks the section in view; closes the contents list on narrow screens
+//   toc        marks the section in view; opens the contents list on wide screens
 //   copy       Copy buttons on code blocks, with an announced "Copied" state
 //   print      opens every <details> while printing, restores them after
 //   search     opens the dialog (button, "/", Ctrl/Cmd+K) and loads search.js on first use
@@ -154,7 +154,8 @@
   var toc = document.querySelector(".toc");
   if (toc) {
     var details = toc.querySelector("details");
-    if (details && !window.matchMedia("(min-width: 64rem)").matches) details.open = false;
+    // Closed in the markup; opened only where it has its own column, so nothing shifts.
+    if (details && window.matchMedia("(min-width: 64rem)").matches) details.open = true;
     var links = toc.querySelectorAll("a[href^='#']");
     var byId = {};
     var targets = [];

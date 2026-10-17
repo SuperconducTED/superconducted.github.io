@@ -277,3 +277,143 @@ math pages (KaTeX CSS). Fonts and images are reported, not budgeted.
 - Brand guide: `SuperconducTED/.github` `brand/README.md`.
 - Buttondown embed form: `docs.buttondown.com/building-your-subscriber-base`.
 - Security review Action: `github.com/anthropics/claude-code-security-review`.
+
+## As of 2026-10-18, later: built and verified locally
+
+Everything in "What will change" exists on branch `site/redesign`, committed locally and not
+pushed. Verification ran on this laptop (Windows 11, Hugo 0.168.0, Chrome, Python 3.12) and is
+provisional until CI runs it on the pull request.
+
+### Where the build departed from the plan, and why
+
+| Plan | Built | Why |
+| --- | --- | --- |
+| Hero mark as a CSS background chosen by a theme token | Two `<img loading="lazy">` (on-light, on-dark), CSS shows one | Simpler and measured to do the same job: a hidden lazy image is never fetched. Lighthouse's network log for Home: `main` downloads both marks (26,662 and 26,669 bytes), the branch only the one on screen (24,794 bytes). |
+| Header logo lazy like the other brand images | Header logo `loading="eager"` | Lighthouse found the lazy logo to be the phone Home page's largest paint and flagged it (`lcp-lazy-loaded`). Both logo versions now load at once, about 5 KB each compressed, as on `main`. |
+| Theme boot stays an external blocking script | Inline, allowed by its SHA-256 in `script-src` | The external file was a render-blocking round trip. Hugo computes the hash (`fingerprint "sha256"`) and `check_site.py` recomputes it from the built page, so a mismatch fails CI instead of silently blocking the script. |
+| Contents list collapsed by script on narrow screens | Closed in the markup, opened by script on wide screens | Collapsing after load shifted the page: Lighthouse measured a layout shift of 0.10 on Get started and How it works. Opening on wide screens moves nothing, because the list has its own column there. |
+| `render-link.html` adds `rel="noopener"` | It draws evidence links (NC-, ADR-, PR #, #) as proof chips | No link on the site opens a new tab; the only `target="_blank"` is the sign-up form, which carries `rel="noopener"`, and the checker now fails any that does not. |
+| Copy numbers typed into the text | `data/claims.yaml` plus `{claim:KEY}` and the `claim` shortcode | Not in the plan. Typed numbers would go stale when the register moves (CI checks `data/facts.yaml` against the register, not prose), so every register figure in the text is now printed from data that CI checks, with its proof chip. |
+| Search script loaded by plain script injection | Loaded through the one Trusted Types policy `sc-loader` | Production enforces Trusted Types, under which a script URL must come from a policy. The policy accepts only `/js/search.min.<sha256>.js`. |
+
+### Copy corrections found while rewriting
+
+- **"Measured again many times a day" was removed.** The old Home and How it works said each
+  qubit's T1, T2 and error rates are re-measured many times a day. The site's own data does not
+  support that for one qubit: `data/drift.json` holds 138 T1 calibrations of qubit 77 from
+  2026-05-08 to 2026-10-15, under one a day. The new text cites the register instead
+  (NC-069: 868 distinct device states archived since May 2026).
+- **Aims stay aims.** "ANFIS fits it to the archive" became "ANFIS training, now in progress,
+  fits it"; the FAQ says the engine "is designed to" describe the spread; the range is "the
+  plan". The research-preview notice moved into the hero.
+- **Tagline.** "Noise as a range, not a number." stays the brand line (footer, page titles,
+  social card) and no longer heads the page; the hero headline is "Put a [range] on your quantum
+  noise model." This keeps the brand decision of 2026-10-16 while removing the two-beat
+  antithesis from the headline. Mert may still want to revisit the tagline itself.
+
+### Checks
+
+`check_site.py` grew from 10 to 17 checks (aliases, csp, scripts, search, feeds, weight,
+release), and the contrast check now covers the raised role and button text on the accent, and
+compares the two dark token blocks. That comparison caught a real fault during the build: a CSS
+comment quoting the selector text made the regex read the light tokens for both themes, so the
+dark-theme contrast check would have checked nothing dark. The regexes now match selectors only
+at the start of a line.
+
+Every new check was mutation-tested (`mutate_checks.py`, kept in the session scratchpad): 18
+planted faults (a style attribute, an inline handler, `target=_blank` without noopener, a
+removed Trusted Types rule, an unhashed inline script, an edited hashed script, `'unsafe-inline'`
+in `script-src`, `innerHTML`, `console.log`, a token written to local storage, a wrong search
+URL, a broken feed entry, a live-reload script, a claim value that disagrees with the register,
+a dark token that differs between blocks, a low-contrast accent, a page over budget, an alias
+that is not noindex). All 18 were reported; every file was restored byte for byte from a backup
+copy and the baseline passed again.
+
+Production build with the production base URL, checked against the engine register fetched from
+`main` on 2026-10-18 (unchanged when re-fetched at the end): all 17 checks pass; 532 links; the
+heaviest page is `tr/how-it-works/` at 151,701 bytes with its CSS and JS (budget 400,000 for
+math pages).
+
+### Interface checks (headless Chrome, `interact.mjs` in the scratch folder `C:/t-lh`)
+
+At 1440 and 390 px: header hairline after a short scroll; back-to-top hidden at the top, shown
+after one screen, returns to the top and focuses `main`; progress bar scales with scroll;
+Ctrl+K opens search and "anfis" finds three pages; Escape closes search. At 390 px with touch:
+the menu opens, Escape closes it and returns focus to the button; a dark choice survives a
+reload; "System" clears the saved choice; no console errors on any run (so the hashed inline
+script and the Trusted Types policy both work in Chrome). In the browser pane: Turkish search
+for "calisir" finds "Nasıl çalışır" with the hit marked; "/" opens search; a real click on Copy
+shows "Kopyalandı" and announces it. Full-page screenshots at 1440 and 390 px, light and dark,
+for Home, How it works, Get started, Team, Updates, the first post, Turkish Home and the 404 page
+show no horizontal overflow after one fix (wide code blocks widened their grid column on phones;
+grid items now have `min-width: 0`).
+
+### Lighthouse (12.8.2, simulated throttling)
+
+Like for like: `main` and this branch, each built with Hugo 0.168.0 and served by the same local
+server that mimics GitHub Pages (gzip, `Cache-Control: max-age=600`, `/404.html`). Scores are
+performance / accessibility / best practices / SEO.
+
+| Page (phone) | `main` | This branch | FCP, LCP in ms, `main` to branch |
+| --- | --- | --- | --- |
+| Home | 99 / 100 / 100 / 92 | 99 / 100 / 100 / 100 | 1,356 to 1,357; 1,982 to 1,882 |
+| How it works | 95 / 100 / 100 / 92 | 95 / 100 / 100 / 100 | 1,960 to 2,110; 2,558 to 2,635 |
+| Get started | 100 / 100 / 93 / 92 | 99 / 100 / 100 / 100 | 1,208 to 1,357; 1,658 to 1,808 |
+| Team | 99 / 100 / 100 / 92 | 99 / 100 / 100 / 100 | 1,206 to 1,356; 1,656 to 1,881 |
+
+On desktop both builds score 100 for performance on every page; the branch also scores 100 for
+accessibility, best practices and SEO on Home, How it works, Get started, Team and Updates.
+Home's total transfer fell from 209,137 to 191,717 bytes (one hero mark instead of two, minified
+brand SVGs) while the page gained search, the FAQ and the updates block.
+
+- **SEO 92 to 100:** `main`'s CSP had `connect-src 'none'`, which also stopped Lighthouse from
+  reading `robots.txt`; `connect-src 'self'` (needed by search) fixes it.
+- **Best practices 93 to 100 on Get started:** `main` logged CSP violations there, because
+  default highlighting wrote inline styles that `style-src 'self'` blocks. Highlighting now uses
+  classes.
+- **Cost:** inner pages paint first about 150 ms later on the phone profile, because the
+  stylesheet grew from 3.0 KB to 8.6 KB compressed. Accepted for now; splitting out the CSS for
+  search, FAQ and print would recover part of it.
+- The first "after" run also showed accessibility 98 on Updates (a sign-up `h3` straight after
+  the page's `h1`); the sign-up heading is now an `h2`.
+
+The original "before" run against the live site (same Lighthouse version) agrees: phone
+performance 100 / 96 / 98 for Home / How it works / Get started, SEO 92 everywhere.
+
+### Security review
+
+The local `/security-review` (a sub-agent reading the whole diff against `origin/main`) reported
+no high or medium findings. It examined the search and site scripts (DOM built with
+`textContent` only, URLs from the same-origin index), the Trusted Types loader, the render hooks
+(no `safeURL`, so `javascript:` links are still refused), the `safeHTML` uses (literals only),
+the CSP template, the sign-up form, the feed and search templates, both workflows
+(`pull_request`, same-repository guard, no event data in a shell) and the checker's XML parsing.
+With nothing reported, the false-positive filter step had nothing to examine.
+
+The GitHub Action itself (`anthropics/claude-code-security-review` at `0c6a49f`) needed two
+adjustments, recorded in the workflow: its default model, `claude-opus-4-1-20250805`, retired on
+2026-08-05, so the workflow sets `claude-model: claude-opus-5-5`; and its optional second-stage
+API filter probes access with a retired model (`claude-3-5-haiku-20241022`), fails, and switches
+itself off. The main Claude Code scan and its pull-request comments still run.
+
+### An unplanned download (reported to Mert)
+
+While re-running the `main` baseline, a backgrounded server command carried the `cd`, so
+`npx lighthouse` ran from the engine worktree, found no local Lighthouse and fetched the newest
+release, 13.5.0, from the npm registry into the npx cache
+(`%LOCALAPPDATA%/npm-cache/_npx/0f94ee7615faf582`, written 2026-10-18 02:12). Mert had approved
+12.8.2 in `C:/t-lh` only. Its eight reports were moved out of the engine worktree into
+`C:/t-lh/reports/stray-lh13/` and are not used above; the baseline was re-run with the pinned
+`C:/t-lh/node_modules/.bin/lighthouse` (12.8.2). The cache entry is left for Mert to keep or
+delete.
+
+### Open items for Mert (as of this section)
+
+- Push the branch and open the pull request (not done; needs his word).
+- Buttondown: create the account, keep double opt-in on, consider turning off open and click
+  tracking, then set `params.newsletter.buttondown` in `hugo.toml`. Until then the "Get
+  updates" box offers the Atom feed and GitHub instead of an email form.
+- Add the `CLAUDE_API_KEY` repository secret to enable the security review, and keep "Require
+  approval for all external contributors" on.
+- Review the Turkish copy and the first update post before merge; the post speaks for the team.
+- Decide whether the tagline stays (see "Copy corrections").

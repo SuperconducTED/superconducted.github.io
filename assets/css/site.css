@@ -471,7 +471,7 @@ html:not(.js) .demo-chart { display: none; }
   background-size: 24px 24px; -webkit-mask-image: linear-gradient(200deg, #000, transparent 60%); mask-image: linear-gradient(200deg, #000, transparent 60%);
 }
 .signup > * { position: relative; }
-.signup h3 { margin: 0.75rem 0 0.5rem; font-size: 1.5rem; letter-spacing: -0.02em; }
+.signup .signup-title { margin: 0.75rem 0 0.5rem; font-size: 1.5rem; letter-spacing: -0.02em; }
 .signup p { color: var(--text-2); margin: 0 0 1rem; }
 .field { display: grid; gap: 0.45rem; }
 .field label { font-weight: 500; font-size: 0.95rem; }
@@ -525,7 +525,7 @@ html:not(.js) .demo-chart { display: none; }
 .toc li a { display: block; padding: 0.3rem 0 0.3rem 0.75rem; border-left: 2px solid var(--grid); color: var(--text-2); text-decoration: none; font-size: 0.92rem; transition: color 0.18s, border-color 0.18s; }
 .toc li a:hover { color: var(--text); border-left-color: var(--axis); }
 .toc li a[aria-current="true"] { color: var(--accent); border-left-color: var(--accent); }
-@media (min-width: 64rem) { .toc details { border: 0; padding: 0; background: none; } .toc summary { list-style: none; cursor: default; } .toc summary::-webkit-details-marker { display: none; } }
+@media (min-width: 64rem) { .toc details { border: 0; padding: 0; background: none; } .toc details[open] summary { list-style: none; cursor: default; } .toc details[open] summary::-webkit-details-marker { display: none; } }
 
 .prose { max-width: var(--measure); }
 .prose > :first-child { margin-top: 0; }
