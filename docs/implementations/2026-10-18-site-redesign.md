@@ -417,3 +417,30 @@ delete.
   approval for all external contributors" on.
 - Review the Turkish copy and the first update post before merge; the post speaks for the team.
 - Decide whether the tagline stays (see "Copy corrections").
+
+### Later the same day: gaps closed after review
+
+- **The sign-up form had not run in any check above** (the username is empty, so no build
+  rendered it). It was then built once with a placeholder username passed through the
+  environment (`HUGO_PARAMS_NEWSLETTER_BUTTONDOWN`, nothing committed) and tested in headless
+  Chrome with buttondown.com resolved to a closed local port, so no request could reach
+  Buttondown. In both languages: the form renders with the embed action and the newsletter
+  script; the CSP reads `form-action https://buttondown.com`; an empty and a malformed address
+  each show the translated message with `aria-invalid` and focus on the field; typing clears the
+  error; a valid address (with surrounding spaces) is trimmed, the box switches to its done
+  state, focus moves to it and the button is disabled; no console errors. Each valid submit
+  opened one new tab towards Buttondown, which failed locally as intended.
+- **The mutation test is now in the repository** as `scripts/mutate_check_site.py` (it was a
+  scratchpad file when the section above was written). Rerun after this change: 18 of 18 faults
+  reported, exit 0, every file restored.
+- **Search options:** the link is now the listbox option itself (`role="option"` on the `<a>`,
+  the list item `role="none"`); before, a link sat inside the option, which ARIA does not allow.
+  Lighthouse could not see this because the dialog is closed during an audit.
+- **Popover fallback:** in a browser without the Popover API the contact button and menu are
+  hidden (the footer has the same two links), instead of the menu rendering as page content.
+- **Security workflow:** the action exports `GITHUB_TOKEN: ${{ github.token }}` itself
+  (action.yml at `0c6a49f`, lines 181 and 324), so checkout's `persist-credentials: false` does
+  not starve it. It also installs `@anthropic-ai/claude-code` from npm without a version pin at
+  run time, which pinning the action's commit does not cover.
+- After these changes: all 17 checks pass on the production build, and the 19 interface checks
+  pass.

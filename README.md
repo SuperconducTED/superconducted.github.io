@@ -33,6 +33,15 @@ inline theme script), unsafe DOM calls in the scripts, the search index, the Ato
 weight budget per page, and more; its docstring lists them all. The workflow runs the same
 three steps.
 
+A check that has never been seen failing proves nothing, so `scripts/mutate_check_site.py`
+plants one fault per guard in a built site (and, for a moment, in a few source files), expects
+`check_site.py` to report each one, and restores every file. Run it on a clean working tree
+after changing a check:
+
+```bash
+python -I scripts/mutate_check_site.py public <path to the engine's docs/numerical-claims.md>
+```
+
 To click through a production build in a browser, build it for a local address (otherwise the
 pages point their fonts and icons at the live site, and their CSP blocks that) and serve the
 folder with any static server:
@@ -58,7 +67,7 @@ hugo build --gc --minify --baseURL http://127.0.0.1:8137/ --destination ../site-
 | `assets/css/site.css` | Styles on the Cryostat colour tokens, including print styles. |
 | `assets/js/` | `theme-boot.js` (inline, before paint), `site.js` (every page), `search.js` (loaded on the first search), `newsletter.js` (sign-up pages only), `drift-demo.js` (Home). |
 | `static/` | Brand files, fonts, KaTeX's stylesheet and fonts. See `NOTICE` for their licences. |
-| `scripts/` | `extract_drift.py`, `sync_brand.py`, `build_fonts.py`, `check_site.py`. |
+| `scripts/` | `extract_drift.py`, `sync_brand.py`, `build_fonts.py`, `check_site.py`, `mutate_check_site.py`. |
 | `docs/implementations/` | Records of each change: plan, decisions, verification. |
 
 ## Updating

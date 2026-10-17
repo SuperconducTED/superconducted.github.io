@@ -175,11 +175,14 @@
       }
       for (var i = 0; i < hits.length; i++) {
         var rec = hits[i].rec;
+        // The link itself is the listbox option (ARIA allows no interactive element inside
+        // an option); the list item is presentation only.
         var li = document.createElement("li");
-        li.id = "search-hit-" + i;
-        li.setAttribute("role", "option");
-        li.setAttribute("aria-selected", "false");
+        li.setAttribute("role", "none");
         var a = document.createElement("a");
+        a.id = "search-hit-" + i;
+        a.setAttribute("role", "option");
+        a.setAttribute("aria-selected", "false");
         a.href = rec.u;
         a.tabIndex = -1;
         var sec = document.createElement("span");
@@ -213,7 +216,7 @@
       if (ev.key === "ArrowDown") { ev.preventDefault(); select(selected + 1); }
       else if (ev.key === "ArrowUp") { ev.preventDefault(); select(selected - 1); }
       else if (ev.key === "Enter") {
-        var item = list.querySelector("[aria-selected='true'] a");
+        var item = list.querySelector("a[aria-selected='true']");
         if (item) { ev.preventDefault(); dialog.close(); window.location.assign(item.href); }
       }
     });
