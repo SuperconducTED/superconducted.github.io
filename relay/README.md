@@ -30,7 +30,9 @@ the site").
 
 You need a free Cloudflare account, a Buttondown API key, and **Node.js 22 or newer** (Wrangler
 4.87.0 and later refuse older Node; check with `node -v`). On Windows the current LTS installs with
-`winget install OpenJS.NodeJS.LTS` (then open a new terminal). Nobody else, including Claude,
+`winget install OpenJS.NodeJS.LTS` (then open a new terminal); if an older Node came from winget's
+`OpenJS.NodeJS.20` package, run `winget uninstall OpenJS.NodeJS.20` first and approve the
+administrator prompt, since `winget upgrade` keeps that package on 20.x. Nobody else, including Claude,
 should ever see the key.
 
 1. **Create a Buttondown API key** at [buttondown.com/keys](https://buttondown.com/keys). Give it

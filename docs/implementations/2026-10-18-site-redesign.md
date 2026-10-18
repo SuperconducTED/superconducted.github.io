@@ -661,3 +661,14 @@ machine has Node 20.16.0, which the guide had not said. The newest Wrangler that
 20 is 4.86.0 (2026-04-28), but its `undici` 7.24.8 requires Node 20.18.1, and Node 20 itself
 reached end of life in April 2026, so the fix is a current Node LTS, not an older Wrangler. The
 guide now states the requirement and the Windows install command.
+
+Node replaced on Mert's machine (2026-10-18, on his word): Node.js 20.16.0 (winget package
+`OpenJS.NodeJS.20`) uninstalled and Node.js 24.20.0 LTS (`OpenJS.NodeJS.LTS`, installer hash
+verified by winget) installed in its place; a fresh shell now resolves `node` to v24.20.0 and npm to
+11.19.0. Two things the guide's one-line command did not anticipate: `winget uninstall --silent`
+fails with Windows Installer error 1730 ("You must be an Administrator") because silent mode
+suppresses the elevation prompt, and `winget upgrade` keeps the `OpenJS.NodeJS.20` package on
+20.x, so an old winget Node has to be removed first, with an administrator prompt. The relay
+config then passed `wrangler@4.145.0 deploy --dry-run` (run offline from the npx cache, nothing
+uploaded): a 4.61 KiB bundle with the `SIGNUP_LIMITER` rate limit (5 per 60 s) and both variables
+bound. Whether Mert's Cloudflare plan accepts that rate limit still shows only on the real deploy.
