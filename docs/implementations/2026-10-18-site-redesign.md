@@ -647,3 +647,11 @@ Not verified, and cannot be from here: the deployed Worker on Cloudflare (Mert's
 the free plan accepts the rate-limit binding (Cloudflare's page does not say; a third-party
 write-up suggests it does), and a real confirmation email (the first real address should be
 Mert's own, through the curl check in `relay/README.md`).
+
+Checked after review: a build with `relay` set in `hugo.toml` (a placeholder address, restored to
+empty afterwards) passes all 17 site checks, with `connect-src 'self'` plus that origin on every
+page and the relay strings rendered in both languages; `compatibility_date` moved back to
+2026-09-01 so the pinned Wrangler 4.145.0 accepts it. One upstream assumption is unconfirmed:
+Buttondown documents `metadata` as a JSON object, but not that arbitrary keys (`source`,
+`language`) are accepted; if Mert's first curl check returns `metadata_invalid`, drop `metadata`
+from the payload.

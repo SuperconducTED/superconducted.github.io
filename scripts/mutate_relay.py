@@ -9,8 +9,12 @@ unnoticed, if a mutation no longer applies, or if the restored tests fail. Run i
 working tree; it needs Node 20 or later.
 """
 import os
+import shutil
 import subprocess
 import sys
+
+if not shutil.which("node"):
+    sys.exit("mutate_relay.py needs Node 20 or later on PATH (the relay tests run with node --test).")
 
 repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = f"{repo}/relay/src/index.js"

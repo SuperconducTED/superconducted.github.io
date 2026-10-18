@@ -3,7 +3,9 @@
 # never written in this file or anywhere else in the repository.
 name = "superconducted-newsletter"
 main = "src/index.js"
-compatibility_date = "2026-10-01"
+# Kept well before the pinned Wrangler's release (4.145.0, 2026-09-30): Wrangler refuses a date
+# newer than its bundled runtime knows.
+compatibility_date = "2026-09-01"
 workers_dev = true
 
 [vars]

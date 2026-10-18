@@ -62,7 +62,10 @@ ever see the key.
    curl -sS -X POST -H "Origin: https://superconducted.github.io" -H "Content-Type: application/x-www-form-urlencoded" --data "email=YOUR_ADDRESS&lang=en" https://superconducted-newsletter.YOUR_SUBDOMAIN.workers.dev/subscribe
    ```
 
-   It should print `{"ok":true}`, and Buttondown's confirmation email should arrive.
+   This is a real sign-up: it creates a pending subscriber on your list, so it should print
+   `{"ok":true}` and Buttondown's confirmation email should arrive (confirm it, or delete the
+   subscriber in Buttondown afterwards). If it prints `{"ok":false,"error":"unavailable"}`, the
+   secret is missing or the key lacks subscriber access.
 6. **Switch the site over:** set `relay` under `[params.newsletter]` in `hugo.toml` to the full
    `/subscribe` address from step 3 (or send it to Claude). The forms then subscribe on the page,
    and the relay's origin joins the site's Content Security Policy.
