@@ -651,6 +651,7 @@ html:not(.js) .demo-chart { display: none; }
 .search-input::-webkit-search-cancel-button { display: none; }
 .search-body { overflow-y: auto; padding: 0.5rem; flex: 1; }
 .search-status { margin: 0.75rem; color: var(--text-2); font-size: 0.95rem; }
+.search-status .button { margin-top: 0.6rem; }
 .search-results { list-style: none; margin: 0; padding: 0; }
 .search-results a { display: grid; gap: 0.2rem; padding: 0.75rem 0.8rem; border-radius: 10px; color: var(--text); text-decoration: none; }
 .search-results a:hover, .search-results a[aria-selected="true"] { background: var(--surface); }

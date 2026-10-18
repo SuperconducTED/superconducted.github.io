@@ -7,7 +7,7 @@ script URL and its SRI hash travel in data attributes; site.js accepts only a fi
 <dialog class="search needs-js" id="search" aria-labelledby="search-title"
   data-src="{{ $search.RelPermalink }}" data-integrity="{{ $search.Data.Integrity }}"
   data-index="{{ with $index }}{{ .RelPermalink }}{{ end }}" data-lang="{{ site.Language.Locale }}"
-  data-loading="{{ T "search_loading" }}" data-empty="{{ T "search_empty" }}" data-error="{{ T "search_error" }}"
+  data-loading="{{ T "search_loading" }}" data-empty="{{ T "search_empty" }}" data-error="{{ T "search_error" }}" data-stale="{{ T "search_stale" }}" data-reload="{{ T "search_reload" }}"
   data-count-one="{{ T "search_count_one" }}" data-count-other="{{ T "search_count_other" }}" data-hint="{{ T "search_hint" }}">
   <h2 class="visually-hidden" id="search-title">{{ T "search" }}</h2>
   <div class="search-bar">

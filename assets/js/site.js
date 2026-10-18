@@ -57,9 +57,9 @@
   onAll("[data-theme-set]", "click", function (ev) {
     var mode = ev.currentTarget.getAttribute("data-theme-set");
     if (mode === savedTheme()) return;
-    // A soft cross-fade where the browser has view transitions and motion is welcome.
-    if (document.startViewTransition && !reduceMotion) document.startViewTransition(function () { applyTheme(mode); });
-    else applyTheme(mode);
+    // Instant on purpose: a view-transition cross-fade was tried, but Chrome does not hit-test
+    // the page while one plays, so a second click within it was silently lost.
+    applyTheme(mode);
   });
   markTheme();
 
@@ -273,10 +273,27 @@
       if (input) { input.focus(); input.select(); }
       loadSearch().then(function () {
         window.SuperconductedSearch.attach(dialog);
-      }, function () {
-        var status = dialog.querySelector(".search-status");
-        if (status) status.textContent = dialog.getAttribute("data-error");
-      });
+      }, searchFailed);
+    };
+    // The search script is fingerprinted, and a deploy replaces every file. A page whose HTML
+    // was cached before the latest deploy (GitHub Pages allows 10 minutes) asks for a script
+    // that no longer exists. A 404 for it means exactly that, so the dialog says so and offers
+    // a reload instead of blaming the connection.
+    var searchFailed = function () {
+      var status = dialog.querySelector(".search-status");
+      if (!status) return;
+      status.textContent = dialog.getAttribute("data-error");
+      fetch(dialog.getAttribute("data-src"), { method: "HEAD", cache: "no-store", credentials: "same-origin" }).then(function (r) {
+        if (r.status !== 404) return;
+        status.textContent = dialog.getAttribute("data-stale") + " ";
+        var reload = document.createElement("button");
+        reload.type = "button";
+        reload.className = "button small";
+        reload.textContent = dialog.getAttribute("data-reload");
+        reload.addEventListener("click", function () { window.location.reload(); });
+        status.appendChild(reload);
+        reload.focus();
+      }, function () { /* offline: the connection message above stands */ });
     };
     onAll("[data-search-open]", "click", openSearch);
     dialog.addEventListener("close", function () {

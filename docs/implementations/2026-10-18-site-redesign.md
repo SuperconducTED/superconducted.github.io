@@ -444,3 +444,27 @@ delete.
   run time, which pinning the action's commit does not cover.
 - After these changes: all 17 checks pass on the production build, and the 19 interface checks
   pass.
+
+### After the pull request opened: search reported broken
+
+Mert reported that search did not work. The browser tab he was looking at held a copy of the
+page from before one of the local rebuilds: it asked for `search.min.f41017ee...js`, a
+fingerprint the rebuilt site no longer had (404), so the dialog said it could not load. A reload
+fixed it. The same thing can happen to a real visitor: GitHub Pages lets browsers keep a page's
+HTML for 10 minutes, every deploy replaces all files, and search loads its script only when it
+is first opened. Two changes:
+
+- **A missing search script now explains itself.** When the script fails to load, site.js asks
+  for it again with a `HEAD` request; a 404 means the page is older than the latest deploy, and
+  the dialog says so ("The site was updated after this page loaded...") with a focused "Reload
+  the page" button. Any other failure keeps the connection message. Tested in headless Chrome in
+  both languages by pointing a page at a fingerprint that is not in the build.
+- **The theme switch is instant, as a departure from the plan.** The plan's view-transition
+  cross-fade lost clicks: while a transition plays, Chrome does not hit-test the page (clicks
+  landed on the root element, even with `pointer-events: none` on `::view-transition`), so a
+  second click within about 250 ms was dropped, and skipped transitions left unhandled
+  `AbortError` rejections in the console. A test of six quick clicks now ends on the last choice
+  with no console errors.
+
+All 17 checks pass on the production build, the mutation test reports 18 of 18, and the 19
+interface checks pass.
