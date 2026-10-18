@@ -36,7 +36,7 @@ MUTATIONS = [
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("<main id=main", '<a href=https://example.org target=_blank>x</a><main id=main', 1)),
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("trusted-types sc-loader", "", 1).replace("require-trusted-types-for 'script';", "", 1)),
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("</body>", "<script>alert(1)</script></body>", 1)),
-    ("csp", f"{site}/en/team/index.html", lambda s: s.replace('t.classList.add("js")', 't.classList.add("jz")', 1)),
+    ("csp", f"{site}/en/team/index.html", lambda s: s.replace('getItem("superconducted-theme")', 'getItem("superconducted-themX")', 1)),
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("script-src 'self' '", "script-src 'self' 'unsafe-inline' '", 1)),
     ("scripts", f"{repo}/assets/js/newsletter.js", lambda s: s + "\nerror.innerHTML = 'x';\n"),
     ("scripts", f"{repo}/assets/js/site.js", lambda s: s + "\nconsole.log('debug');\n"),

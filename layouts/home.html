@@ -189,10 +189,10 @@ how do I follow it, what do I do now. */ -}}
 {{ end }}
 
 {{ define "scripts" }}
-{{- $demo := resources.Get "js/drift-demo.js" | minify | fingerprint }}
+{{- $demo := partial "js.html" "drift-demo" }}
 <script src="{{ $demo.RelPermalink }}" integrity="{{ $demo.Data.Integrity }}" defer></script>
 {{- if site.Params.newsletter.buttondown }}
-{{- $nl := resources.Get "js/newsletter.js" | minify | fingerprint }}
+{{- $nl := partial "js.html" "newsletter" }}
 <script src="{{ $nl.RelPermalink }}" integrity="{{ $nl.Data.Integrity }}" defer></script>
 {{- end }}
 {{ end }}

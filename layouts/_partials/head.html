@@ -12,7 +12,7 @@
     rule is production-only too.
   * The 200-byte theme boot script runs inline, before first paint, allowed by its SHA-256 hash
     rather than 'unsafe-inline' (an external file cost a render-blocking round trip). */ -}}
-{{- $boot := resources.Get "js/theme-boot.js" | minify | fingerprint "sha256" }}
+{{- $boot := partial "js.html" "theme-boot" }}
 {{- $style := cond (.Params.math | default false) "'self' 'unsafe-inline'" "'self'" }}
 {{- $connect := cond hugo.IsDevelopment "'self' ws://localhost:1313" "'self'" }}
 {{- $form := cond (gt (len site.Params.newsletter.buttondown) 0) "https://buttondown.com" "'none'" }}

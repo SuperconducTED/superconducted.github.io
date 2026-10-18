@@ -33,7 +33,7 @@ Checks:
              rel="noopener"
   scripts    the shipped scripts (assets/js) use no HTML-string sinks (innerHTML, outerHTML,
              insertAdjacentHTML, document.write, eval, new Function), no console logging, and
-             write only the two preference keys to local storage
+             write only the three preference keys to local storage (theme, language, banner)
   search     each language's search.json parses and lists exactly the language's built pages
              (404 and redirects excepted)
   feeds      each language's updates/atom.xml parses as an Atom feed with one complete entry
@@ -58,7 +58,7 @@ SITE = "https://superconducted.github.io"
 LANGS = ("en", "tr")
 SAME_IN_BOTH = {"demo_axis_y", "footer_tagline"}  # brand line and units stay as they are
 EM_DASH = chr(0x2014)  # built from its code point so this file does not contain one
-STORAGE_KEYS = {"superconducted-theme", "superconducted-lang"}
+STORAGE_KEYS = {"superconducted-theme", "superconducted-lang", "superconducted-newsletter"}
 # Uncompressed bytes of a page plus the CSS and JS it references. Math pages also load KaTeX's
 # stylesheet. Fonts and images are not counted (they are cached across pages and lazy).
 BUDGET = 200_000

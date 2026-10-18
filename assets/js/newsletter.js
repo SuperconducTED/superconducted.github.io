@@ -7,7 +7,8 @@
 // message, (2) stops double posts with a short cool-down, and (3) switches the box to its done
 // state, which says what happens next: confirm in the Buttondown tab, then click the link in
 // the email. The page cannot see Buttondown's answer, so it never claims more than that.
-// Nothing is stored or logged; the address goes from the form straight to Buttondown.
+// The address is never stored or logged; it goes from the form straight to Buttondown. After a
+// submit, the preference key superconducted-newsletter = "subscribed" hides the banner.
 (function () {
   "use strict";
   var COOL_DOWN_MS = 8000;
@@ -49,6 +50,9 @@
         if (box) box.classList.add("is-done");
         if (done) done.focus();
       }, 0);
+      // Stop inviting this browser to sign up: theme-boot.js hides the banner on later pages.
+      try { window.localStorage.setItem("superconducted-newsletter", "subscribed"); } catch (e) { /* not remembered */ }
+      document.documentElement.classList.add("nl-hidden");
       window.setTimeout(function () { busy = false; button.disabled = false; }, COOL_DOWN_MS);
     });
   }

@@ -29,7 +29,7 @@
 
 {{ define "scripts" }}
 {{- if site.Params.newsletter.buttondown }}
-{{- $nl := resources.Get "js/newsletter.js" | minify | fingerprint }}
+{{- $nl := partial "js.html" "newsletter" }}
 <script src="{{ $nl.RelPermalink }}" integrity="{{ $nl.Data.Integrity }}" defer></script>
 {{- end }}
 {{ end }}

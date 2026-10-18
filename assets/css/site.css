@@ -173,6 +173,24 @@ main:focus { outline: none; }
 .icon-button:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
 .icon-button:active { transform: scale(0.94); }
 
+/* ---------- Newsletter banner: above the header, scrolls away, closable ---------- */
+.nl-banner { border-bottom: 1px solid var(--grid); }
+.nl-hidden .nl-banner { display: none; }
+.nl-banner-row { display: flex; align-items: center; gap: 0.5rem 1rem; min-height: 3rem; padding-block: 0.45rem; }
+.nl-banner-text { display: flex; align-items: center; gap: 0.6rem; margin: 0 auto 0 0; font-size: 0.92rem; color: var(--text-2); }
+.nl-banner-text strong { color: var(--text); font-weight: 500; }
+.nl-banner-text .icon { color: var(--accent); }
+.nl-banner-cta { flex: none; }
+.nl-cta-short { display: none; }
+.nl-banner-close { width: 2.25rem; height: 2.25rem; }
+/* Phones: one line, the newsletter's name, a short button and the close control. */
+@media (max-width: 40rem) {
+  .nl-banner-row { gap: 0.5rem; }
+  .nl-banner-text { font-size: 0.85rem; min-width: 0; }
+  .nl-rest, .nl-cta-long, .nl-banner-cta .icon { display: none; }
+  .nl-cta-short { display: inline; }
+}
+
 /* ---------- Header: sticky, with the reading-progress bar ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 40;
@@ -694,7 +712,7 @@ html:not(.js) .demo-chart { display: none; }
   }
   html { font-size: 11pt; }
   body { background: #FFFFFF; color: #000000; }
-  .site-header, .fab-stack, .contact-menu, .skip, .progress, .search, .theme-switch, .menu-toggle, .copy,
+  .site-header, .nl-banner, .fab-stack, .contact-menu, .skip, .progress, .search, .theme-switch, .menu-toggle, .copy,
   .signup, .final .actions, .replay, .toc, .hero::before, .readout::before, .final::after, .pager { display: none !important; }
   .print-only { display: block; margin-bottom: 1rem; font-size: 9pt; color: #333333; }
   .on-dark { display: none !important; }

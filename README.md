@@ -65,7 +65,7 @@ hugo build --gc --minify --baseURL http://127.0.0.1:8137/ --destination ../site-
 | `data/brand.yaml` | Which brand-kit files are in `static/`, from which commit, with their SHA-256. |
 | `layouts/` | Hugo templates (the v0.146+ layout: `baseof.html`, `home.html`, `page.html`, `updates/`, `_partials/`, `_markup/`, `_shortcodes/`). `home.searchindex.json` writes each language's search index. |
 | `assets/css/site.css` | Styles on the Cryostat colour tokens, including print styles. |
-| `assets/js/` | `theme-boot.js` (inline, before paint), `site.js` (every page), `search.js` (loaded on the first search), `newsletter.js` (sign-up pages only), `drift-demo.js` (Home). |
+| `assets/js/` | `theme-boot.js` (inline, before paint), `site.js` (every page), `search.js` (loaded on the first search), `newsletter.js` (sign-up pages only), `drift-demo.js` (Home). Minified by Hugo's esbuild through `layouts/_partials/js.html`; Hugo's own JS minifier is off (`hugo.toml`) so it cannot rewrite the hashed inline script. |
 | `static/` | Brand files, fonts, KaTeX's stylesheet and fonts. See `NOTICE` for their licences. |
 | `scripts/` | `extract_drift.py`, `sync_brand.py`, `build_fonts.py`, `check_site.py`, `mutate_check_site.py`. |
 | `docs/implementations/` | Records of each change: plan, decisions, verification. |
@@ -102,6 +102,12 @@ confirms every address by email (double opt-in) before subscribing it. No secret
 the form needs only the public username. Buttondown's RSS-to-email automation (a paid feature)
 reads Atom feeds too, so with it a new post reaches subscribers without a manual send; each entry's
 Atom `id` is its permanent URL, which Buttondown uses to avoid sending a post twice.
+
+Setting the username also turns on the newsletter banner: a slim bar above the header on every
+page whose link goes to the sign-up box (on Home and the Updates pages) or to the Updates page's
+box (everywhere else). Closing it, or signing up, stores `superconducted-newsletter` in the
+visitor's browser, and the inline boot script hides the bar before paint from then on. Clearing
+the username removes the form, the banner and the CSP's `form-action` together.
 
 ## Security
 

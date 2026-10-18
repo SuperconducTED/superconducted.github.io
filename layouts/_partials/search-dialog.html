@@ -2,7 +2,7 @@
 loads assets/js/search.js on first use, which fetches this language's search index once. The
 script URL and its SRI hash travel in data attributes; site.js accepts only a fingerprinted
 /js/search.min.<sha256>.js path (Trusted Types policy "sc-loader"). */ -}}
-{{- $search := resources.Get "js/search.js" | minify | fingerprint }}
+{{- $search := partial "js.html" "search" }}
 {{- $index := site.Home.OutputFormats.Get "searchindex" }}
 <dialog class="search needs-js" id="search" aria-labelledby="search-title"
   data-src="{{ $search.RelPermalink }}" data-integrity="{{ $search.Data.Integrity }}"

@@ -1,0 +1,18 @@
+{{- /* The newsletter banner: a slim bar above the header on every page, rendered only while
+params.newsletter.buttondown is set, so it never points at a switched-off form. Its link goes to
+the sign-up box on this page when there is one (Home and the Updates pages), else to the Updates
+page's box. The close button needs script (site.js stores "dismissed"); a completed sign-up
+stores "subscribed" (newsletter.js); theme-boot.js reads either before paint and hides the bar.
+Without script the bar stays, with its link working. */ -}}
+{{- if site.Params.newsletter.buttondown }}
+{{- $here := or .IsHome (eq .Section "updates") }}
+{{- $href := "#get-updates" }}
+{{- if not $here }}{{ with site.GetPage "/updates" }}{{ $href = printf "%s#get-updates" .RelPermalink }}{{ end }}{{ end }}
+<aside class="nl-banner inverse" aria-label="{{ T "banner_label" }}">
+  <div class="wrap nl-banner-row">
+    <p class="nl-banner-text">{{ partial "icon.html" "mail" }}<span><strong>{{ T "banner_title" }}</strong><span class="nl-rest">: {{ T "banner_text" }}</span></span></p>
+    <a class="button primary small nl-banner-cta" href="{{ $href }}" data-nl-jump aria-label="{{ T "banner_cta" }}"><span class="nl-cta-long">{{ T "banner_cta" }}</span><span class="nl-cta-short" aria-hidden="true">{{ T "banner_cta_short" }}</span>{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</a>
+    <button class="icon-button nl-banner-close needs-js" type="button" aria-label="{{ T "banner_close" }}" title="{{ T "banner_close" }}">{{ partial "icon.html" "close" }}</button>
+  </div>
+</aside>
+{{- end }}

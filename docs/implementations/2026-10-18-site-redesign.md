@@ -494,3 +494,42 @@ languages:
 
 Also fixed: on Turkish pages the chart label upper-cased `ibm_fez` with Turkish rules ("İBM");
 the backend name is now marked `lang="en"`.
+
+### Newsletter banner, and a hash bug it exposed (Mert, 2026-10-18)
+
+Mert asked for a working newsletter sign-up and a banner at the top that guides people to it, and
+chose a banner on every page that can be closed and stays closed. The sign-up itself was already
+built and tested; it is switched on by setting `params.newsletter.buttondown`, which needs the
+Buttondown account only Mert can create (he was given the steps: account, username, leave open
+and click tracking off, which Buttondown makes opt-in; double opt-in is Buttondown's default and
+cannot be turned off for public forms, per its documentation).
+
+- **Banner** (`layouts/_partials/newsletter-banner.html`, rendered above the header only while
+  the username is set): the newsletter's name, one line on what it sends, a "Subscribe by email"
+  link, and a close button. On Home and the Updates pages the link scrolls to the sign-up box and
+  puts the cursor in the email field; elsewhere it opens the Updates page at the box. Closing it
+  stores `superconducted-newsletter = dismissed`; a completed sign-up stores `subscribed`;
+  `theme-boot.js` reads the key before paint and hides the bar, so it never appears and then
+  jumps away. On phones it is one 51 px line (name, "Subscribe", close); the long button text stays
+  as the link's accessible name. The footer privacy line now mentions banner choices, and
+  `check_site.py` allows the third preference key.
+- **Bug found by the test, not by a reader:** extending the inline theme boot changed its
+  minified bytes, and the HTML minifier re-minified the inline script (renaming its variables a
+  second time), so the page's CSP hash no longer matched and Chrome blocked the script. The
+  earlier version had happened to survive the second pass. `check_site.py` would have failed CI
+  on it (it recomputes the hash); the headless sign-up test caught it first. Fix: Hugo's JS
+  minifier is off (`[minify] disableJS = true`), so the HTML minifier leaves inline scripts byte
+  for byte, and every script is minified by Hugo's built-in esbuild instead
+  (`layouts/_partials/js.html`, `js.Build` with `minify`, target ES2017). Script sizes are about
+  what they were (site.js 7,988 bytes, search.js 4,786).
+- **Tests** (headless Chrome, placeholder username passed through the environment, buttondown.com
+  resolved to a closed local port): banner shown on six page types in both languages; the Home
+  link focuses the email field in view; the Turkish Team link opens `/tr/updates/#get-updates`;
+  close hides it, stores `dismissed`, and it stays hidden from first paint on the next page; a
+  sign-up stores `subscribed` and hides it; no overflow at 390 px; no console errors. The sign-up
+  checks (both languages) and the 19 interface checks pass; all 17 site checks pass on the
+  production build, where the banner is absent until the username is set; the mutation test
+  reports 18 of 18 after one mutation was retargeted at a string literal that esbuild keeps.
+
+Still owed: Mert's Buttondown username. Until it is set, production shows neither the form nor
+the banner.

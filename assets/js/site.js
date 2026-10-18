@@ -12,9 +12,10 @@
 //   copy       Copy buttons on code blocks, with an announced "Copied" state
 //   print      opens every <details> while printing, restores them after
 //   search     opens the dialog (button, "/", Ctrl/Cmd+K) and loads search.js on first use
+//   banner     newsletter banner: close (remembered), and jump to the sign-up box with focus
 //
-// Storage keys: superconducted-theme and superconducted-lang only (preferences, no tokens or
-// personal data). Every storage access is wrapped: blocked storage just means no memory.
+// Storage keys: superconducted-theme, superconducted-lang and superconducted-newsletter only
+// (preferences, no tokens or personal data). Every storage access is wrapped: blocked storage just means no memory.
 (function () {
   "use strict";
   var root = document.documentElement;
@@ -67,6 +68,32 @@
   onAll("a.lang[data-lang]", "click", function (ev) {
     store("superconducted-lang", ev.currentTarget.getAttribute("data-lang"));
   });
+
+  // ---- Newsletter banner ----------------------------------------------------------------------
+  var banner = document.querySelector(".nl-banner");
+  if (banner) {
+    var close = banner.querySelector(".nl-banner-close");
+    if (close) {
+      close.addEventListener("click", function () {
+        store("superconducted-newsletter", "dismissed");
+        root.classList.add("nl-hidden");
+        var brand = document.querySelector(".brand");
+        if (brand) brand.focus(); // the focused button just disappeared; land on the next control
+      });
+    }
+    // On a page that has the sign-up box, the link scrolls to it; put the cursor in the field.
+    var jump = banner.querySelector("[data-nl-jump]");
+    if (jump && jump.getAttribute("href").charAt(0) === "#") {
+      jump.addEventListener("click", function (ev) {
+        var box = document.getElementById("get-updates");
+        if (!box) return;
+        ev.preventDefault();
+        box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+        var field = box.querySelector("input[type='email']") || box.querySelector("a");
+        if (field) field.focus({ preventScroll: true });
+      });
+    }
+  }
 
   // ---- Header state, back to top ------------------------------------------------------------
   var header = document.querySelector(".site-header");

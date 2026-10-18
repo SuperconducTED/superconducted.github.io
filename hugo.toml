@@ -18,6 +18,12 @@ timeZone = 'UTC'
     source = 'static/brand'
     target = 'assets/brand'
 
+# Hugo's JavaScript minifier is off: scripts are minified by esbuild in layouts/_partials/js.html.
+# With it on, the HTML minifier re-minified the inline theme boot (renaming its variables again),
+# so the bytes no longer matched the SHA-256 hash in the CSP and browsers blocked the script.
+[minify]
+  disableJS = true
+
 [pagination]
   pagerSize = 10
 
