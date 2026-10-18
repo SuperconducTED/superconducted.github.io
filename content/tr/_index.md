@@ -8,7 +8,7 @@ hero:
   title_before: "Kuantum gürültü modelinize bir"
   title_range: "aralık"
   title_after: "verin."
-  sub: "Tek bir kalibrasyondan kurulan gürültü modeli, çip sürüklendikçe eskir. **SuperconducTED, Qiskit Aer için bir gürültü motoru geliştiriyor.** Motor kalibrasyon geçmişinin tamamından öğrenir; böylece simülasyonunuz donanımı izleyen bir aralık verebilir."
+  sub: "Tek bir kalibrasyondan kurulan gürültü modeli, gürültüsü sürekli değişen bir çipten alınmış tek bir örnektir. **SuperconducTED, Qiskit Aer için bir gürültü motoru geliştiriyor.** Motor, bu gürültünün kalibrasyon geçmişi boyunca ne kadar yayıldığını öğrenir; böylece simülasyonunuz bir aralık verebilir."
   primary:
     label: "Motorun nasıl çalıştığını görün"
     url: "how-it-works/"
@@ -71,7 +71,7 @@ faq:
     - q: "IBM Quantum hesabı gerekir mi?"
       a: "Motoru kurmak ya da testlerini çalıştırmak için gerekmez. IBM Quantum anahtarı yalnızca canlı kalibrasyonları kendiniz toplamak için gerekir. Motorun eğitildiği arşiv, motorun herkese açık deposunda."
     - q: "Her kalibrasyondan sonra modeli yeniden kurmak yetmez mi?"
-      a: "Yine tek bir anlık görüntüyü simüle edersiniz ve o da bir sonraki kalibrasyonda eskimeye başlar. Motor, gürültünün geçmiş boyunca nasıl değiştiğini öğrenmek ve iki kalibrasyon arasında beklenecek yayılımı tanımlamak üzere tasarlandı."
+      a: "Yeni kurulan model iyi bir tek tahmindir ve ortalamada yanlış olduğunu iddia etmiyoruz. Söyleyemediği şey, donanımın ondan ne kadar uzakta olabileceğidir. IBM, izleme sistemi bir sürüklenme yakaladığında çipin ilgili kısımlarını yeniden kalibre eder ([IBM'in kalibrasyon kılavuzu](https://quantum.cloud.ibm.com/docs/en/guides/calibration-jobs)) ve rutin tek bir T1 ölçümü, bir kübitin uzun dönem ortalamasını ancak zayıf biçimde öngörür ([Carroll vd. 2022](https://doi.org/10.1038/s41534-022-00643-y)). Motor bu yayılımı kalibrasyon geçmişinden öğrenip bir aralık olarak vermek üzere tasarlandı. Aralığı, donanımda tekrarlanan çalıştırmaları ne sıklıkla kapsadığına bakarak, yeni kurulan modeli temel alarak değerlendirmeyi planlıyoruz."
     - q: "Neden bulanık mantık?"
       a: "Bulanık bir kural tabanı okunabilir kalır: her kural hangi kalibrasyon koşullarını kapsadığını söyler. Aralık tip-2 bulanık kümeler kendi girdilerinin belirsizliğini de taşıyabilir; bir aralık da tam bunu gerektirir. ANFIS, kuralları küçük bir sinir ağının eğitildiği gibi eğitir."
     - q: "Bu bir IBM projesi mi?"

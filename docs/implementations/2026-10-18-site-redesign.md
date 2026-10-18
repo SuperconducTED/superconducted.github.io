@@ -468,3 +468,29 @@ is first opened. Two changes:
 
 All 17 checks pass on the production build, the mutation test reports 18 of 18, and the 19
 interface checks pass.
+
+### Copy reworded around spread (Mert, after a personal research audit)
+
+A personal audit of how Qiskit Aer and the other Qiskit projects use calibration snapshots
+(kept outside this repository) found the drift premise well supported but the phrasing "goes
+stale at the next calibration" contested for the average: one study on IBM 127-qubit machines
+found no significant pooled effect of time since calibration over 24 hours. The supported claim is
+about spread: a snapshot model is one point, and it cannot say how far the hardware may be from
+it. On Mert's instruction the two lines that used the contested phrasing were rewritten in both
+languages:
+
+- **Hero line:** "goes stale as the chip drifts" became "a single draw from a chip whose noise
+  keeps moving", and the engine "learns how far that noise spreads across the whole calibration
+  history".
+- **FAQ, "Isn't rebuilding the model after each calibration enough?":** the answer now says the
+  fresh model is a good single estimate that we do not claim is wrong on average, that it cannot
+  say how far the hardware may sit from it, and cites IBM's "Monitor, calibrate, and benchmark"
+  guide (calibrations triggered when monitoring detects drift) and Carroll et al. 2022, npj
+  Quantum Information 8, 132, DOI 10.1038/s41534-022-00643-y (a single routine T1 measurement
+  predicts a qubit's long-run mean only weakly). No figure from either source is quoted on the
+  site. The answer also states a plan: judge the range by how often it covers repeated hardware
+  runs, with the fresh model as the baseline. That is a public commitment to an evaluation method,
+  made on Mert's word.
+
+Also fixed: on Turkish pages the chart label upper-cased `ibm_fez` with Turkish rules ("İBM");
+the backend name is now marked `lang="en"`.

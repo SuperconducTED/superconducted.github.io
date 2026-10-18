@@ -27,7 +27,7 @@ how do I follow it, what do I do now. */ -}}
     {{- $from := time.Format ":date_long" (time.AsTime (index $first 0)) }}
     {{- $to := time.Format ":date_long" (time.AsTime (index $last 0)) }}
     <figure class="readout" aria-labelledby="demo-title">
-      <div class="readout-head" aria-hidden="true"><span>{{ .source.backend }} · {{ T "demo_qubit" }} {{ .qubit }}</span><span>T1 · <span class="unit">µs</span></span></div>
+      <div class="readout-head" aria-hidden="true"><span><span lang="en">{{ .source.backend }}</span> · {{ T "demo_qubit" }} {{ .qubit }}</span><span>T1 · <span class="unit">µs</span></span></div>
       <div class="demo-chart" id="drift-chart" role="img"
            aria-label="{{ T "demo_summary" (dict "qubit" .qubit "min" (lang.FormatNumber 1 (math.Min $vals)) "max" (lang.FormatNumber 1 (math.Max $vals)) "n" (len $pts) "first" (lang.FormatNumber 1 (index $first 1))) }}"
            data-label-measured="{{ T "demo_measured" }}" data-label-frozen="{{ T "demo_frozen" }}"

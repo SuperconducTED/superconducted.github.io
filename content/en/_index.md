@@ -8,7 +8,7 @@ hero:
   title_before: "Put a"
   title_range: "range"
   title_after: "on your quantum noise model."
-  sub: "A noise model built from one calibration goes stale as the chip drifts. **SuperconducTED is building a noise engine for Qiskit Aer** that learns from the whole calibration history, so your simulation can report a range that follows the hardware."
+  sub: "A noise model built from one calibration is a single draw from a chip whose noise keeps moving. **SuperconducTED is building a noise engine for Qiskit Aer** that learns how far that noise spreads across the whole calibration history, so your simulation can report a range."
   primary:
     label: "See how the engine works"
     url: "how-it-works/"
@@ -71,7 +71,7 @@ faq:
     - q: "Do I need an IBM Quantum account?"
       a: "Not to install the engine or run its tests. You need an IBM Quantum token only to poll live calibrations yourself. The archive the engine trains on is in the engine's public repository."
     - q: "Isn't rebuilding the model after each calibration enough?"
-      a: "You would still simulate one snapshot, and it starts to age at the next calibration. The engine is designed to learn how noise moves across the whole history and to describe the spread you should expect between calibrations."
+      a: "A fresh model is a good single estimate, and we don't claim it is wrong on average. What it can't tell you is how far the hardware may sit from it. IBM recalibrates parts of a chip whenever its monitoring detects drift ([IBM's calibration guide](https://quantum.cloud.ibm.com/docs/en/guides/calibration-jobs)), and a single routine T1 measurement predicts a qubit's long-run average only weakly ([Carroll et al. 2022](https://doi.org/10.1038/s41534-022-00643-y)). The engine is designed to learn that spread from the calibration history and report it as a range. We plan to judge the range by how often it covers repeated runs on the hardware, with the fresh model as the baseline."
     - q: "Why fuzzy logic?"
       a: "A fuzzy rule base stays readable: each rule names the calibration conditions it covers. Interval type-2 fuzzy sets can also carry the uncertainty of their own inputs, which is what a range needs. ANFIS trains the rules the way a small neural network is trained."
     - q: "Is this an IBM project?"
