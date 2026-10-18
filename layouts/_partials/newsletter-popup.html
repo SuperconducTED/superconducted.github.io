@@ -13,7 +13,7 @@ everyone). */ -}}
   <button class="icon-button nl-popup-close" type="button" data-nl-dismiss aria-label="{{ T "popup_close" }}" title="{{ T "popup_close" }}">{{ partial "icon.html" "close" }}</button>
   <p class="kicker">{{ T "popup_label" }}</p>
   <h2 class="signup-title" id="nl-popup-title">{{ T "popup_title" }}</h2>
-  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ . | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}" data-page="https://buttondown.com/{{ . | urlquery }}" data-error-busy="{{ T "signup_error_busy" }}" data-error-blocked="{{ T "signup_error_blocked" }}" data-error-down="{{ T "signup_error_down" }}" data-page-text="{{ T "signup_page_link" }}"{{ with site.Params.newsletter.relay }} data-relay="{{ . }}"{{ end }}>
+  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ . | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}" data-error-busy="{{ T "signup_error_busy" }}" data-error-blocked="{{ T "signup_error_blocked" }}" data-error-down="{{ T "signup_error_down" }}" data-error-network="{{ T "signup_error_network" }}" data-fallback-text="{{ T "signup_fallback" }}" data-done-tab="{{ T "signup_done_text" }}"{{ with site.Params.newsletter.relay }} data-relay="{{ . }}"{{ end }}>
     <p>{{ T "popup_text" }}</p>
     <div class="field">
       <label class="visually-hidden" for="nl-popup-email">{{ T "signup_label" }}</label>
@@ -31,7 +31,7 @@ everyone). */ -}}
   </form>
   <div class="signup-done" role="status" aria-live="polite" tabindex="-1">
     <span class="done-mark">{{ partial "icon.html" "check" }}</span>
-    <p><strong>{{ T "signup_done_title" }}</strong> {{ T (cond (gt (len site.Params.newsletter.relay) 0) "signup_done_relay" "signup_done_text") }}</p>
+    <p><strong>{{ T "signup_done_title" }}</strong> <span class="signup-done-text">{{ T (cond (gt (len site.Params.newsletter.relay) 0) "signup_done_relay" "signup_done_text") }}</span></p>
   </div>
 </section>
 {{- end }}

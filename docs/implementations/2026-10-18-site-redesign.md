@@ -723,3 +723,11 @@ Buttondown now disclosed in the fine print and the footer; two overstated claims
 README and code comment corrected). The record is `2026-10-18-relay-security-review.md`. Statements
 above that the relay "logs nothing" hold on Cloudflare's side only once the Worker is deployed
 again with that config.
+
+## Later: fallback for filtered networks and a daily relay check (2026-10-18)
+
+A sign-up from a line with Türk Telekom's opt-in Safe Internet family profile showed the relay's
+"down" message: that filter resets every `workers.dev` connection. The forms now say when the
+relay cannot be reached at all and offer a button that posts the typed address to Buttondown's own
+page, and a daily GitHub workflow checks the live relay with requests that subscribe nobody. The
+record is `2026-10-18-relay-fallback-and-health-check.md`.

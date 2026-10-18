@@ -7,7 +7,11 @@
 //    API key) with fetch, and the visitor never leaves the page. The relay answers with JSON:
 //    { ok: true } (Buttondown is sending its confirmation email, or the address was already
 //    there: the two are deliberately indistinguishable) or { ok: false, error }, which becomes a
-//    translated message. If the relay cannot be reached, the message offers Buttondown's own page.
+//    translated message. When the relay cannot be reached at all (some networks block its
+//    workers.dev address, for example Türk Telekom's opt-in Safe Internet family profile), when it
+//    reports Buttondown unavailable, or when Buttondown's firewall refuses the address, the
+//    message carries a button that posts the typed address to Buttondown's own page in a new tab:
+//    the plain form below, one click, nothing retyped.
 //  * Plain form (no relay, or no script at all): a standard POST to Buttondown in a new tab, as
 //    Buttondown requires for its embed endpoint; this script only checks the address first and
 //    shows what happens next, since the page cannot see Buttondown's answer.
@@ -31,24 +35,43 @@
     var error = form.querySelector(".field-error");
     var button = form.querySelector("button[type='submit']");
     var done = box && box.querySelector(".signup-done");
+    var doneText = done && done.querySelector(".signup-done-text");
+    var trap = form.querySelector("input[name='website']");
     var relay = form.getAttribute("data-relay");
     var busy = false;
     if (!input || !error || !button) return;
     form.noValidate = true; // this script shows its own, translated messages
 
-    // A message under the field, optionally followed by a link (built as nodes, never as HTML).
-    function show(message, linkText, linkHref) {
+    // A message under the field, optionally followed by the fallback button (built as nodes,
+    // never as HTML).
+    function show(message, withFallback) {
       error.replaceChildren();
       if (message) error.appendChild(document.createTextNode(message));
-      if (linkText && linkHref) {
-        error.appendChild(document.createTextNode(" "));
-        var a = document.createElement("a");
-        a.href = linkHref;
-        a.textContent = linkText;
-        error.appendChild(a);
+      var label = form.getAttribute("data-fallback-text");
+      if (withFallback && label) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "button small fallback";
+        b.textContent = label;
+        b.addEventListener("click", fallback);
+        error.appendChild(b);
       }
       if (message) input.setAttribute("aria-invalid", "true");
       else input.removeAttribute("aria-invalid");
+    }
+
+    // The plain form, on request: the browser posts the address already in the field to
+    // Buttondown's embed endpoint (the form's own action, target _blank), where Buttondown can ask
+    // for a CAPTCHA. form.submit() skips this script's submit handler, and running inside the
+    // click keeps the new tab from being blocked. The honeypot is disabled for that moment, so it
+    // is not sent: it belongs to the relay, not to Buttondown.
+    function fallback() {
+      if (trap) trap.disabled = true;
+      form.submit();
+      if (trap) trap.disabled = false;
+      if (doneText && form.getAttribute("data-done-tab")) doneText.textContent = form.getAttribute("data-done-tab");
+      show("");
+      finish();
     }
     input.addEventListener("input", function () { if (input.hasAttribute("aria-invalid")) show(""); });
 
@@ -81,7 +104,6 @@
 
       ev.preventDefault();
       button.setAttribute("aria-busy", "true");
-      var trap = form.querySelector("input[name='website']");
       var body = new URLSearchParams();
       body.set("email", value);
       body.set("lang", (document.documentElement.getAttribute("lang") || "en").slice(0, 2));
@@ -97,9 +119,13 @@
         referrerPolicy: "strict-origin-when-cross-origin",
         signal: controller ? controller.signal : undefined
       }).then(function (r) {
+        // An answer that is not the relay's JSON (an error page from the platform) counts as the
+        // service being unavailable.
         return r.json().catch(function () { return { ok: false, error: "unavailable" }; });
       }, function () {
-        return { ok: false, error: "unavailable" };
+        // No answer at all: the connection was refused or reset (a network filter), the request
+        // was blocked, or the timeout above aborted it.
+        return { ok: false, error: "network" };
       }).then(function (answer) {
         if (timer) window.clearTimeout(timer);
         if (answer && answer.ok === true) {
@@ -109,12 +135,11 @@
         }
         release();
         var code = answer && answer.error;
-        var page = form.getAttribute("data-page");
-        var pageText = form.getAttribute("data-page-text");
         if (code === "invalid") show(form.getAttribute("data-error-invalid"));
         else if (code === "busy") show(form.getAttribute("data-error-busy"));
-        else if (code === "blocked") show(form.getAttribute("data-error-blocked"), pageText, page);
-        else show(form.getAttribute("data-error-down"), pageText, page);
+        else if (code === "blocked") show(form.getAttribute("data-error-blocked"), true);
+        else if (code === "network") show(form.getAttribute("data-error-network"), true);
+        else show(form.getAttribute("data-error-down"), true);
         input.focus();
       });
     });
