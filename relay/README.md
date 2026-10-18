@@ -84,17 +84,30 @@ Buttondown in a new tab, which also remains the path for visitors without JavaSc
 
 ## When a visitor's network blocks it
 
-Some networks refuse every `workers.dev` address. Türk Telekom's opt-in "Güvenli İnternet" family
-profile does: it resets the connection during the TLS handshake, and a plain-HTTP request is
-redirected to `guvenliinternet.turktelekom.com.tr`. To the visitor the relay then looks broken
-while it is fine everywhere else. The forms handle it: when the relay cannot be reached at all,
-the message says the visitor's network did not let the page reach the service and offers a
-"Finish on Buttondown's page" button, which posts the typed address to Buttondown's own page in
-a new tab (the same button appears when the relay reports Buttondown unavailable or Buttondown's
-firewall refuses the address). To tell a filter from an outage on a given connection, open
-`http://superconducted-newsletter.superconducted.workers.dev/` in a browser: a Türk Telekom
-warning page means the line is filtered; `{"ok":false,"error":"not_found"}` means the relay is
-reachable.
+Some networks refuse `workers.dev` addresses. Türk Telekom's opt-in "Güvenli İnternet" family
+profile does it by the name a connection asks for: it resets the TLS handshake, and a plain-HTTP
+request is redirected to `guvenliinternet.turktelekom.com.tr`. On such a line `curl`, Node and
+Wrangler cannot reach the relay, but on 2026-10-18 a Chromium browser on the same line could (the
+name was probably hidden by Encrypted Client Hello, which Cloudflare supports), so whether a
+visitor is blocked depends on their browser as well as their network. When the relay cannot be
+reached at all, the form says the visitor's network did not let the page reach the service and
+offers a "Finish on Buttondown's page" button, which posts the typed address to Buttondown's own
+page in a new tab (the same button appears when the relay reports Buttondown unavailable or
+Buttondown's firewall refuses the address). To test a connection, open
+`https://superconducted-newsletter.superconducted.workers.dev/` in the browser in question:
+`{"ok":false,"error":"not_found"}` means it reaches the relay, a connection-reset error means it
+is filtered. (The `http://` address is no test for a browser: without TLS nothing hides the name,
+so it is redirected even where the browser's HTTPS requests get through.)
+
+## Buttondown's answers
+
+Measured against the live API on 2026-10-18 (Buttondown's documentation gives no error body
+shape): an address already on the list gets `400` with code `email_already_exists`, which the
+relay turns into the same `{"ok": true}` as a new address; an address Buttondown's spam firewall
+refuses gets `400` with code `subscriber_blocked`, which the relay turns into `blocked`. Every
+answer is a JSON object with `code`, `detail` and `metadata`; the relay reads only `code` and
+never passes any of it on. An unknown code becomes `unavailable`. The tests pin both measured
+answers.
 
 ## Daily health check
 
@@ -119,4 +132,5 @@ node --test relay/test/relay.test.js
 The tests run the Worker's handler in Node 20 or later with Buttondown replaced by a stub. CI runs
 them in the Pages workflow. `scripts/mutate_relay.py` plants faults in the handler (origin check
 removed, honeypot ignored, an upsert header, a log line, a raw address as a rate-limit key, an
-existing address revealed) and fails unless the tests catch every one.
+existing address revealed, Buttondown's firewall refusal left unmapped) and fails unless the tests
+catch every one.

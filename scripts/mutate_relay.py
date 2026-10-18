@@ -29,6 +29,7 @@ MUTATIONS = [
     ("logs the address", 'const lang = form.get("lang")', 'console.log(email); const lang = form.get("lang")'),
     ("raw address as limiter key", '"mail:" + (await sha256(email.toLowerCase()))', '"mail:" + email'),
     ("existing address revealed", 'code === "email_already_exists" || ', ""),
+    ("firewall refusal unmapped", 'code === "subscriber_blocked" || ', ""),
 ]
 TESTS = ["node", "--test", "test/relay.test.js"]
 original = open(src, "rb").read()
