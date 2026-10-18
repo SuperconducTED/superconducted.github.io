@@ -20,6 +20,7 @@ follow-up pull request.
 |---|---|
 | `relay/wrangler.toml` | `[observability] enabled = false`, so Cloudflare keeps no request logs for the relay. |
 | `relay/README.md` | "Only the website can use it" narrowed to "from a browser", with why a script is not stopped; the "no logs" guarantee now names the config switch and that it needs a redeploy. |
+| `relay/test/relay.test.js` | New test: `wrangler.toml` must have an `[observability]` table with `enabled = false`, so a later edit cannot silently turn the logs back on. Header comment gives the test command by file. |
 | `relay/src/index.js` | Comment only: the hashed address in the rate-limit key is not described as "no personal data" any more. No code change. |
 | `i18n/en.yaml`, `i18n/tr.yaml` | The sign-up box's fine print adds that Buttondown receives the visitor's IP address for its spam checks; the footer's privacy line adds that signing up sends the address and IP address to Buttondown. |
 | `docs/implementations/2026-10-18-relay-security-review.md` | This record. |
@@ -106,7 +107,9 @@ address, counted per Cloudflare location and approximately, by Cloudflare's own 
 node --test relay/test/relay.test.js
 ```
 
-14 of 14 pass (Node 24.20.0).
+15 of 15 pass (Node 24.20.0). The new logging test was checked against two broken copies of
+`wrangler.toml`, one with `enabled = true` and one without the `[observability]` table: it
+failed on both, and the file was restored byte for byte from a backup.
 
 ```bash
 python -I scripts/mutate_relay.py

@@ -1,7 +1,9 @@
-// Unit tests for the newsletter relay, run with Node 20+ (`node --test relay/test/`), using the
-// platform's own Request and Response. Buttondown is replaced by a stub; nothing leaves the machine.
+// Unit tests for the newsletter relay, run with Node 20+ (`node --test relay/test/relay.test.js`),
+// using the platform's own Request and Response. Buttondown is replaced by a stub; nothing leaves
+// the machine.
 import { test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { handle, MAX_BODY } from "../src/index.js";
 
 const SITE = "https://superconducted.github.io";
@@ -175,4 +177,14 @@ test("without CF-Connecting-IP no ip_address is sent", async () => {
   const up = upstream();
   await handle(req({ ip: "" }), ENV, { fetch: up });
   assert.equal("ip_address" in up.calls[0].body, false);
+});
+
+// The sign-up form promises the relay logs nothing. Cloudflare persists request logs for new
+// Workers unless wrangler.toml switches them off, so the switch is pinned here.
+test("wrangler.toml turns Cloudflare's request logs off", () => {
+  const toml = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+  const table = toml.match(/^\[observability\][^\n]*\n((?:(?!\[)[^\n]*(?:\n|$))*)/m);
+  assert.ok(table, "wrangler.toml has an [observability] table");
+  assert.match(table[1], /^enabled\s*=\s*false\s*$/m);
+  assert.doesNotMatch(table[1], /^enabled\s*=\s*true/m);
 });
