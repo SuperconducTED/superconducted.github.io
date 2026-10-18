@@ -583,3 +583,67 @@ Not done here, by design: a real subscription. The first real test is Mert's own
 merge (or from a local build), which also checks Buttondown's confirmation email. Open and click
 tracking stay off unless Mert turns them on in Buttondown; the footer's "no tracking" line covers
 this site, not Buttondown.
+
+### Plan: sign up without leaving the site (Mert, same day)
+
+Mert wants visitors to subscribe on the site itself, with no new tab. Buttondown's embed form
+cannot do that: its documentation requires a standard form post (the subscriber may need a CAPTCHA
+on Buttondown's page) and forbids `fetch`, and the endpoint answers with `X-Frame-Options: DENY`.
+Options considered and put to Mert: Buttondown's own iframe embed (on-site, but Buttondown's look
+and language, and it sets Buttondown cookies, `fingerprint` and a 30-day `initial_path`, which
+would contradict the footer's "no cookies"), Resend (needs a verified domain the project does not
+own, and a confirmation flow we would build ourselves), or a server-side relay to Buttondown's
+API. **Mert chose the Buttondown relay.**
+
+Design:
+
+| Piece | What it does |
+| --- | --- |
+| `relay/` (new, in this repository) | A Cloudflare Worker, `POST /subscribe`. Accepts a form-encoded body (`email`, `lang`, and a honeypot field `website`), so the browser sends a simple CORS request with no preflight. |
+| Origin check | Rejects any request whose `Origin` is not in `ALLOWED_ORIGINS` (`https://superconducted.github.io`, plus local origins only in development). Responses carry `Access-Control-Allow-Origin` for that origin alone, `Vary: Origin`, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. |
+| Validation | Body at most 2 KB; email trimmed, at most 254 characters, the site's own pattern; `lang` limited to `en` or `tr`. A filled honeypot gets the normal success answer and is dropped. |
+| Rate limits | Cloudflare's rate-limiting binding when the plan has it (per visitor IP and per hashed address, 60 s windows; it is per location and approximate by Cloudflare's own description), and in every case Buttondown's spam firewall, which the relay feeds with the visitor's IP (`ip_address`), as Buttondown's API documentation recommends for forms without CAPTCHA. |
+| Buttondown call | `POST https://api.buttondown.com/v1/subscribers` with `Authorization: Token <secret>`, `email_address`, `ip_address`, `metadata` (source and language), `type: "unactivated"` (double opt-in, Buttondown's default, which sends the confirmation email). No `X-Buttondown-Collision-Behavior` header: its documented effect covers unsubscribed addresses, but what `add` with `unactivated` does to an already active subscriber is undocumented, and it must never put a subscriber back into "pending"; an existing address therefore gets a 400 from Buttondown and the neutral answer below. No tags (new tags need a paid plan). |
+| Answers | Success, existing and suppressed addresses all get the same answer ("if this address is not subscribed yet, a confirmation link is on its way"), so the form cannot be used to learn who is subscribed. `email_invalid` and 422 map to "invalid", `firewall_blocked` to "blocked" (with Buttondown's own page as the way forward), 429 to "busy", anything else to "unavailable". |
+| Secrets and logs | The Buttondown API key exists only as a Worker secret, which Mert creates (a key limited to subscribers, since Buttondown keys can be scoped) and sets himself with `wrangler secret put`; it never appears in the repository, the site or this session. The Worker logs nothing about requests (no addresses, no IPs). |
+| Site | A new `params.newsletter.relay` (the Worker's URL). When set, `newsletter.js` sends the form to the relay with `fetch` and shows the real result inline, in the page's language; the CSP's `connect-src` adds the relay's origin. Without script, or if the relay cannot be reached, the form still posts to Buttondown in a new tab as today, so a sign-up never dead-ends. Until Mert deploys the Worker, the parameter stays empty and the site behaves exactly as now. |
+
+Verification planned: unit tests for the Worker in Node 20 with the platform's own `Request` and
+`Response` (origin, method, size, honeypot, validation, every Buttondown answer, CORS headers, the
+rate-limit paths, and that nothing is logged), then the site and the real Worker code together in
+headless Chrome, with Buttondown replaced by a local stub so no address leaves the machine; the
+site checks and the mutation test; and the checker extended to the relay setting. Deployment
+(Cloudflare account, API key, `wrangler deploy`) is Mert's, from steps in `relay/README.md`.
+
+### As built: the newsletter relay
+
+Built as planned, with these specifics:
+
+| File | What it is |
+| --- | --- |
+| `relay/src/index.js` | The Worker (`handle(request, env, deps)`); the contract is in its header comment. |
+| `relay/wrangler.toml` | Name `superconducted-newsletter`, `ALLOWED_ORIGINS`, the API address, and the rate-limit binding `SIGNUP_LIMITER` (5 per 60 s, namespace 1001), with a note to delete that block if the plan rejects it. |
+| `relay/test/relay.test.js` | 14 unit tests in Node 20 with the platform's `Request` and `Response`, Buttondown stubbed, and a console spy that fails any test in which the relay logs. |
+| `relay/README.md` | Why, guarantees, and Mert's deployment steps (API key at buttondown.com/keys limited to subscribers, Cloudflare account, `wrangler@4.145.0` login, deploy, `secret put`, a curl check with his own address, then `relay` in `hugo.toml`). |
+| `scripts/mutate_relay.py` | Six planted faults in the Worker; the tests caught all six. |
+| `assets/js/newsletter.js` | With `data-relay` on the form: validates, posts with `fetch` (form-encoded, `credentials: omit`, 12 s timeout), shows the result in place, and on `blocked`, `unavailable` or a network failure offers Buttondown's page as a link (built as nodes, never as HTML). Without it: the new-tab path, unchanged. |
+| `layouts/_partials/signup.html`, `newsletter-popup.html` | `data-relay` and the translated messages; the honeypot field `website` (off-screen, `tabindex=-1`, `aria-hidden`) only while the relay is set; done text and fine print that describe the relay path. |
+| `layouts/_partials/head.html` | `connect-src` gains the relay's origin only when both the username and the relay are set. |
+| `scripts/check_site.py` | `connect-src` must be `'self'` plus the configured relay origin and nothing else, and `form-action` must be Buttondown's origin exactly when the newsletter is configured (read from `hugo.toml` with `tomllib`); the em-dash scan covers `relay/`. Two new mutations (a widened `connect-src`, a foreign `form-action`): 20 of 20 reported. |
+| `.github/workflows/pages.yml` | Runs `node --test relay/test/` before the site checks. |
+| `hugo.toml` | `relay = ''`: until Mert deploys the Worker the site behaves exactly as before. |
+
+End-to-end test (headless Chrome; the site built with `relay` pointing at the real Worker code run
+locally by a small Node adapter, Buttondown replaced by a stub, buttondown.com resolved to a
+closed port): 13 of 13. The pop-up subscribed in place in Turkish with no new tab; the stub
+received the address with `type: unactivated`, the language and the visitor's IP; an existing
+address got the same neutral answer as a new one; invalid, busy, blocked and down each showed
+their message with the form usable again, and the last two offered Buttondown's page; an
+unreachable relay never dead-ended; the honeypot was invisible and untabbable; without script the
+box still posted to Buttondown and the pop-up stayed hidden. The relay-off path still passes its
+15 box checks and 19 pop-up checks.
+
+Not verified, and cannot be from here: the deployed Worker on Cloudflare (Mert's account), whether
+the free plan accepts the rate-limit binding (Cloudflare's page does not say; a third-party
+write-up suggests it does), and a real confirmation email (the first real address should be
+Mert's own, through the curl check in `relay/README.md`).

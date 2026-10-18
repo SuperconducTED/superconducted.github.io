@@ -3,8 +3,9 @@
 {{- /* Content Security Policy, set per page (GitHub Pages cannot send response headers).
   * style-src: KaTeX positions glyphs with inline style attributes, so pages with math allow
     inline styles; every other page allows only our own stylesheet.
-  * connect-src 'self': the search script fetches this language's search.json; nothing else.
-    hugo server's live reload adds its websocket in development.
+  * connect-src 'self': the search script fetches this language's search.json. When the
+    newsletter relay is configured (params.newsletter.relay), its origin is added so the sign-up
+    forms can reach it; nothing else. hugo server's live reload adds its websocket in development.
   * form-action: 'none', or Buttondown's origin once params.newsletter.buttondown is set.
   * Trusted Types (production): no script may turn a string into HTML or a script URL, except
     through the one policy "sc-loader", which assets/js/site.js uses to load the search script
@@ -15,6 +16,10 @@
 {{- $boot := partial "js.html" "theme-boot" }}
 {{- $style := cond (.Params.math | default false) "'self' 'unsafe-inline'" "'self'" }}
 {{- $connect := cond hugo.IsDevelopment "'self' ws://localhost:1313" "'self'" }}
+{{- if and site.Params.newsletter.buttondown site.Params.newsletter.relay }}
+{{- $relay := urls.Parse site.Params.newsletter.relay }}
+{{- $connect = printf "%s %s://%s" $connect $relay.Scheme $relay.Host }}
+{{- end }}
 {{- $form := cond (gt (len site.Params.newsletter.buttondown) 0) "https://buttondown.com" "'none'" }}
 {{- $tt := cond hugo.IsProduction "; require-trusted-types-for 'script'; trusted-types sc-loader" "" }}
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src {{ $style | safeHTMLAttr }}; font-src 'self'; script-src 'self' '{{ $boot.Data.Integrity }}'; connect-src {{ $connect | safeHTMLAttr }}; base-uri 'self'; form-action {{ $form | safeHTMLAttr }}; object-src 'none'{{ $tt | safeHTMLAttr }}">

@@ -56,6 +56,13 @@ jobs:
           # GitHub Pages serves /404.html for every missing path; Hugo writes one per language.
           cp public/en/404.html public/404.html
 
+      - name: Relay tests
+        # The newsletter relay (relay/) is deployed by hand to Cloudflare; its tests run here so a
+        # change cannot land untested. Node 20+ ships on the runner image.
+        run: |
+          node --version
+          node --test relay/test/
+
       - name: Check
         run: |
           # The facts strip must agree with the engine's register on main.

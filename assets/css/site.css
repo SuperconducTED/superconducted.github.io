@@ -520,6 +520,9 @@ html:not(.js) .demo-chart { display: none; }
 .input[aria-invalid="true"] { border-color: #F5A396; }
 .field-error { margin: 0; min-height: 1.4em; font-size: 0.9rem; color: #F5A396; }
 .fineprint { font-size: 0.82rem; color: var(--text-2); margin: 0.75rem 0 0; }
+/* The relay's honeypot: off-screen and out of the tab order; people never see it, bots fill it. */
+.hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.field-error a { color: var(--accent); }
 .signup-done { display: none; }
 .signup.is-done .signup-form { display: none; }
 .signup.is-done .signup-done { display: block; }

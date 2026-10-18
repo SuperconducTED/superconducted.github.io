@@ -12,22 +12,25 @@ state; without script the browser's own validation runs and Buttondown's page ta
   <p class="kicker">{{ T "signup_kicker" }}</p>
   <h2 class="signup-title">{{ T "signup_title" }}</h2>
   {{- if $user }}
-  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ $user | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}">
+  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ $user | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}" data-page="https://buttondown.com/{{ $user | urlquery }}" data-error-busy="{{ T "signup_error_busy" }}" data-error-blocked="{{ T "signup_error_blocked" }}" data-error-down="{{ T "signup_error_down" }}" data-page-text="{{ T "signup_page_link" }}"{{ with site.Params.newsletter.relay }} data-relay="{{ . }}"{{ end }}>
     <p>{{ T "signup_text" }}</p>
     <div class="field">
       <label for="signup-email">{{ T "signup_label" }}</label>
       <div class="field-row">
         <input class="input" type="email" id="signup-email" name="email" required maxlength="254" autocomplete="email" inputmode="email" spellcheck="false" placeholder="{{ T "signup_placeholder" }}" aria-describedby="signup-error signup-fine">
         <input type="hidden" name="embed" value="1">
+        {{- if site.Params.newsletter.relay }}
+        <span class="hp" aria-hidden="true"><label>{{ T "signup_trap" }} <input type="text" name="website" value="" tabindex="-1" autocomplete="off"></label></span>
+        {{- end }}
         <button class="button primary" type="submit">{{ T "signup_button" }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</button>
       </div>
       <p class="field-error" id="signup-error" aria-live="polite"></p>
     </div>
-    <p class="fineprint" id="signup-fine">{{ T "signup_fine" }}</p>
+    <p class="fineprint" id="signup-fine">{{ T (cond (gt (len site.Params.newsletter.relay) 0) "signup_fine_relay" "signup_fine") }}</p>
   </form>
   <div class="signup-done" role="status" aria-live="polite" tabindex="-1">
     <span class="done-mark">{{ partial "icon.html" "check" }}</span>
-    <p><strong>{{ T "signup_done_title" }}</strong> {{ T "signup_done_text" }}</p>
+    <p><strong>{{ T "signup_done_title" }}</strong> {{ T (cond (gt (len site.Params.newsletter.relay) 0) "signup_done_relay" "signup_done_text") }}</p>
   </div>
   {{- else }}
   <p>{{ T "signup_off_text" }}</p>

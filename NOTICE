@@ -4,7 +4,8 @@ Copyright (c) 2026 SuperconducTED contributors
 This repository is licensed in two parts (owner decision, 2026-10-16).
 
 1. MIT License (LICENSE): the code that builds the site: hugo.toml, layouts/,
-   assets/ (stylesheets and scripts), scripts/ and .github/.
+   assets/ (stylesheets and scripts), scripts/, .github/, archetypes/ and the
+   newsletter relay in relay/.
 
 2. Creative Commons Attribution 4.0 International, CC BY 4.0
    (https://creativecommons.org/licenses/by/4.0/): the text of the site:

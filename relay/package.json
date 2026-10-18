@@ -1,0 +1,9 @@
+{
+  "name": "superconducted-newsletter-relay",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker that subscribes website visitors to the SuperconducTED newsletter on Buttondown without leaving the page.",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}

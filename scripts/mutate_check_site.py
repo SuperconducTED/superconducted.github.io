@@ -38,6 +38,8 @@ MUTATIONS = [
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("</body>", "<script>alert(1)</script></body>", 1)),
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace('getItem("superconducted-theme")', 'getItem("superconducted-themX")', 1)),
     ("csp", f"{site}/en/team/index.html", lambda s: s.replace("script-src 'self' '", "script-src 'self' 'unsafe-inline' '", 1)),
+    ("csp", f"{site}/en/team/index.html", lambda s: s.replace("connect-src 'self'", "connect-src 'self' https://evil.example", 1)),
+    ("csp", f"{site}/en/team/index.html", lambda s: s.replace("form-action https://buttondown.com", "form-action https://evil.example", 1)),
     ("scripts", f"{repo}/assets/js/newsletter.js", lambda s: s + "\nerror.innerHTML = 'x';\n"),
     ("scripts", f"{repo}/assets/js/site.js", lambda s: s + "\nconsole.log('debug');\n"),
     ("scripts", f"{repo}/assets/js/site.js", lambda s: s + "\nwindow.localStorage.setItem(\"auth-token\", t);\n"),

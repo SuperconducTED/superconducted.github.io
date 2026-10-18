@@ -86,6 +86,10 @@ timeZone = 'UTC'
     # 2026-10-18). Empty would remove the sign-up forms and the pop-up, and the CSP would go back
     # to form-action 'none' (README, "Newsletter").
     buttondown = 'superconducted'
+    # The newsletter relay (relay/, a Cloudflare Worker holding the Buttondown API key), as its
+    # full /subscribe URL. Set: the forms subscribe on the page through it, and its origin joins
+    # the CSP's connect-src. Empty: the forms post to Buttondown in a new tab, as before.
+    relay = ''
 
 [languages]
   [languages.en]

@@ -27,7 +27,10 @@ Checks:
              token blocks are identical
   csp        every page carries a CSP with script-src 'self' plus only sha256 hashes (no
              'unsafe-inline' or 'unsafe-eval'), object-src 'none', base-uri 'self' and Trusted
-             Types; every inline executable script's SHA-256 is listed in its page's script-src;
+             Types; connect-src is 'self' plus, only when the newsletter relay is configured in
+             hugo.toml, that relay's origin; form-action is Buttondown's origin exactly when the
+             newsletter is configured, else 'none';
+             every inline executable script's SHA-256 is listed in its page's script-src;
              a page whose style-src lacks 'unsafe-inline' has no style attribute or <style>
              element; no page has an inline event handler; target="_blank" links and forms carry
              rel="noopener"
@@ -50,7 +53,9 @@ import json
 import os
 import re
 import sys
+import tomllib
 import xml.etree.ElementTree as ET
+from urllib.parse import urlsplit
 from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -292,12 +297,39 @@ def directives(csp):
     return out
 
 
+def newsletter_config():
+    """(buttondown username, relay origin or None) from hugo.toml's [params.newsletter]."""
+    with open(os.path.join(ROOT, "hugo.toml"), "rb") as f:
+        cfg = tomllib.load(f)
+    nl = cfg.get("params", {}).get("newsletter", {})
+    user, relay = nl.get("buttondown", ""), nl.get("relay", "")
+    origin = None
+    if user and relay:
+        parts = urlsplit(relay)
+        origin = f"{parts.scheme}://{parts.netloc}"
+    return user, origin
+
+
+NEWSLETTER = None
+
+
 def check_csp(rel, page, production):
+    global NEWSLETTER
+    if NEWSLETTER is None:
+        NEWSLETTER = newsletter_config()
+    user, relay_origin = NEWSLETTER
     count("csp", 1)
     if not page.csp:
         fail("csp", f"{rel} has no Content-Security-Policy")
         return
     d = directives(page.csp)
+    connect = d.get("connect-src", [])
+    allowed_connect = ["'self'"] + ([relay_origin] if relay_origin else [])
+    if production and connect != allowed_connect:
+        fail("csp", f"{rel}: connect-src is {' '.join(connect)!r}, expected {' '.join(allowed_connect)!r}")
+    want_form = ["https://buttondown.com"] if user else ["'none'"]
+    if d.get("form-action") != want_form:
+        fail("csp", f"{rel}: form-action is {' '.join(d.get('form-action', []))!r}, expected {want_form[0]!r}")
     script = d.get("script-src", [])
     hashes = [t for t in script if re.fullmatch(r"'sha256-[A-Za-z0-9+/]+=*'", t)]
     if not script or script[0] != "'self'" or len(script) != 1 + len(hashes):
@@ -570,7 +602,7 @@ def check_release(site):
 
 
 def check_source_dashes():
-    for folder in ("content", "i18n", "data", "layouts", "assets", "scripts", "docs", "archetypes"):
+    for folder in ("content", "i18n", "data", "layouts", "assets", "scripts", "docs", "archetypes", "relay"):
         for d, _, files in os.walk(os.path.join(ROOT, folder)):
             for f in files:
                 if f.endswith((".md", ".yaml", ".html", ".css", ".js", ".py", ".json", ".toml", ".xml")):

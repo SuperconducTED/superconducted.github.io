@@ -67,7 +67,8 @@ hugo build --gc --minify --baseURL http://127.0.0.1:8137/ --destination ../site-
 | `assets/css/site.css` | Styles on the Cryostat colour tokens, including print styles. |
 | `assets/js/` | `theme-boot.js` (inline, before paint), `site.js` (every page), `search.js` (loaded on the first search), `newsletter.js` (sign-up pages only), `drift-demo.js` (Home). Minified by Hugo's esbuild through `layouts/_partials/js.html`; Hugo's own JS minifier is off (`hugo.toml`) so it cannot rewrite the hashed inline script. |
 | `static/` | Brand files, fonts, KaTeX's stylesheet and fonts. See `NOTICE` for their licences. |
-| `scripts/` | `extract_drift.py`, `sync_brand.py`, `build_fonts.py`, `check_site.py`, `mutate_check_site.py`. |
+| `scripts/` | `extract_drift.py`, `sync_brand.py`, `build_fonts.py`, `check_site.py`, `mutate_check_site.py`, `mutate_relay.py`. |
+| `relay/` | The newsletter relay: a Cloudflare Worker (`src/index.js`), its configuration (`wrangler.toml`), tests and deployment steps (`README.md`). |
 | `docs/implementations/` | Records of each change: plan, decisions, verification. |
 
 ## Updating
@@ -103,6 +104,11 @@ confirms every address by email (double opt-in) before subscribing it. No secret
 the form needs only the public username. Buttondown's RSS-to-email automation (a paid feature)
 reads Atom feeds too, so with it a new post reaches subscribers without a manual send; each entry's
 Atom `id` is its permanent URL, which Buttondown uses to avoid sending a post twice.
+
+With `params.newsletter.relay` set to the newsletter relay's `/subscribe` address (`relay/`, a
+Cloudflare Worker that holds the Buttondown API key; `relay/README.md` has the deployment steps),
+the forms subscribe on the page instead: no new tab, a real answer, Buttondown's double opt-in
+unchanged. Without script, or with `relay` empty, they post to Buttondown in a new tab.
 
 Setting the username also turns on the newsletter invitation: a card in the style of a consent
 pop-up (bottom left on wide screens, a bottom sheet on phones) that slides in shortly after a
