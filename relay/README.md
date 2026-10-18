@@ -28,15 +28,17 @@ the site").
 
 ## Deploy (Mert)
 
-You need a free Cloudflare account and a Buttondown API key. Nobody else, including Claude, should
-ever see the key.
+You need a free Cloudflare account, a Buttondown API key, and **Node.js 22 or newer** (Wrangler
+4.87.0 and later refuse older Node; check with `node -v`). On Windows the current LTS installs with
+`winget install OpenJS.NodeJS.LTS` (then open a new terminal). Nobody else, including Claude,
+should ever see the key.
 
 1. **Create a Buttondown API key** at [buttondown.com/keys](https://buttondown.com/keys). Give it
    access to subscribers only (write), nothing else. Copy it somewhere safe for step 4.
 2. **Create a Cloudflare account** at [dash.cloudflare.com](https://dash.cloudflare.com/sign-up)
    (the free plan is enough: 100,000 Worker requests a day).
 3. **Log in and deploy** from this folder (Wrangler 4.36.0 or later is needed for rate limits;
-   the version below is pinned):
+   the version below is pinned and needs Node 22 or newer):
 
    ```bash
    npx wrangler@4.145.0 login

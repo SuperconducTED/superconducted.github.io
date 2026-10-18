@@ -655,3 +655,9 @@ page and the relay strings rendered in both languages; `compatibility_date` move
 Buttondown documents `metadata` as a JSON object, but not that arbitrary keys (`source`,
 `language`) are accepted; if Mert's first curl check returns `metadata_invalid`, drop `metadata`
 from the payload.
+
+Found when Mert ran the first deploy step: `wrangler@4.145.0` requires Node 22 or newer and this
+machine has Node 20.16.0, which the guide had not said. The newest Wrangler that still accepts Node
+20 is 4.86.0 (2026-04-28), but its `undici` 7.24.8 requires Node 20.18.1, and Node 20 itself
+reached end of life in April 2026, so the fix is a current Node LTS, not an older Wrangler. The
+guide now states the requirement and the Windows install command.
