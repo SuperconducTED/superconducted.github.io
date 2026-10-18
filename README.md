@@ -95,7 +95,8 @@ date.
 
 ### Newsletter
 
-The "Get updates" box posts to [Buttondown](https://buttondown.com/) when
+The newsletter is [buttondown.com/superconducted](https://buttondown.com/superconducted). The
+"Get updates" box posts to [Buttondown](https://buttondown.com/) when
 `params.newsletter.buttondown` in `hugo.toml` holds the Buttondown username; while it is empty,
 the box offers the Atom feed and GitHub instead and the CSP allows no form at all. Buttondown
 confirms every address by email (double opt-in) before subscribing it. No secret is involved:

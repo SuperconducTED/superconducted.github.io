@@ -82,9 +82,10 @@ timeZone = 'UTC'
   engineDiscussions = 'https://github.com/SuperconducTED/superconducted-noise-engine/discussions'
   engineIssues = 'https://github.com/SuperconducTED/superconducted-noise-engine/issues'
   [params.newsletter]
-    # The Buttondown username. Empty: the signup form is not rendered and the CSP keeps
-    # form-action 'none'. Set it once the Buttondown account exists (README, "Newsletter").
-    buttondown = ''
+    # The Buttondown username (https://buttondown.com/superconducted, created by Mert on
+    # 2026-10-18). Empty would remove the sign-up forms and the pop-up, and the CSP would go back
+    # to form-action 'none' (README, "Newsletter").
+    buttondown = 'superconducted'
 
 [languages]
   [languages.en]

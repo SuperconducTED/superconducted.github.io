@@ -562,3 +562,24 @@ inside it; done state inside it; a box sign-up closes it; 390 px bottom sheet of
 floating buttons hidden and restored; no console errors), the 15 sign-up box checks (now scoped
 to the box, since a page has two forms), 19 interface checks, the stale-page checks, 17 of 17 site
 checks on both the production build and the placeholder build, and 18 of 18 mutations.
+
+### Newsletter switched on (Mert, same day)
+
+Mert created the Buttondown newsletter at https://buttondown.com/superconducted and sent the
+link. Checked before switching on, by a plain GET of the public page only (no address was
+submitted): HTTP 200, title "SuperconducTED • Buttondown", and Buttondown's own page posts to
+`embed-subscribe/superconducted`, the endpoint our forms use. `params.newsletter.buttondown` is
+now `superconducted`, so production renders the sign-up box (Home and the Updates pages), the
+pop-up invitation on every page, and `form-action https://buttondown.com` in the CSP.
+
+Verification with the real username (laptop, provisional; buttondown.com resolved to a closed
+local port in every browser test, so no address could reach the list): 17 of 17 site checks on
+the production build (547 links), 18 of 18 mutations, 19 pop-up checks and 15 sign-up box checks
+in both languages, and Lighthouse 12.8.2 unchanged by the pop-up (desktop Home and How it works
+100 / 100 / 100 / 100; phone Home 99 and How it works 94 for performance, 100 for the other three;
+layout shift at most 0.002).
+
+Not done here, by design: a real subscription. The first real test is Mert's own address after
+merge (or from a local build), which also checks Buttondown's confirmation email. Open and click
+tracking stay off unless Mert turns them on in Buttondown; the footer's "no tracking" line covers
+this site, not Buttondown.
