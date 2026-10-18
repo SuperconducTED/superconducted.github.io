@@ -131,11 +131,36 @@ test("existing and suppressed addresses get the same ok answer as a new one", as
   }
 });
 
+// Buttondown's answers as measured against the live API on 2026-10-18 (status, body shape and
+// field names exactly as returned; the address and subscriber id replaced by placeholders).
+const MEASURED_BLOCKED = { code: "subscriber_blocked", detail: "This subscriber was blocked by your firewall.", metadata: {} };
+const MEASURED_EXISTS = {
+  code: "email_already_exists",
+  detail: "That email address (reader@example.org) is already subscribed (id=00000000-0000-0000-0000-000000000000). To update them instead, retry with the header 'X-Buttondown-Collision-Behavior: overwrite', or PATCH /v1/subscribers/00000000-0000-0000-0000-000000000000.",
+  metadata: { subscriber_id: "00000000-0000-0000-0000-000000000000", remedy_header: "X-Buttondown-Collision-Behavior: overwrite", documentation_url: "https://docs.buttondown.com/api-subscribers-create" },
+};
+
+test("measured: Buttondown's firewall refusal becomes blocked, so the visitor gets the Buttondown-page button", async () => {
+  const res = await handle(req(), ENV, { fetch: upstream(400, MEASURED_BLOCKED) });
+  assert.equal(res.status, 400);
+  assert.deepEqual(await res.json(), { ok: false, error: "blocked" });
+});
+
+test("measured: an existing address gets plain ok, and nothing of Buttondown's answer leaks", async () => {
+  const res = await handle(req(), ENV, { fetch: upstream(400, MEASURED_EXISTS) });
+  assert.equal(res.status, 200);
+  const text = await res.text();
+  assert.equal(text, JSON.stringify({ ok: true }));
+  assert.doesNotMatch(text, /subscriber_id|00000000|already/);
+});
+
 test("Buttondown errors map to the site's messages", async () => {
   const cases = [
     [400, { code: "email_invalid" }, 400, "invalid"],
     [422, { detail: [] }, 400, "invalid"],
+    [400, { code: "subscriber_blocked" }, 400, "blocked"],
     [400, { code: "firewall_blocked" }, 400, "blocked"],
+    [400, { code: "some_new_code" }, 502, "unavailable"],
     [429, {}, 429, "busy"],
     [401, { code: "unauthorized" }, 502, "unavailable"],
     [500, {}, 502, "unavailable"],

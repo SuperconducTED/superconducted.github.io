@@ -113,7 +113,10 @@ export async function handle(request, env, deps = {}) {
   }
   if (upstream.status === 400 && (code === "email_already_exists" || code === "subscriber_suppressed")) return reply(200, { ok: true });
   if ((upstream.status === 400 && code === "email_invalid") || upstream.status === 422) return reply(400, { ok: false, error: "invalid" });
-  if (code === "firewall_blocked") return reply(400, { ok: false, error: "blocked" });
+  // Buttondown's spam firewall. Measured on 2026-10-18 against the live API: 400 with code
+  // "subscriber_blocked" ("This subscriber was blocked by your firewall."). "firewall_blocked" is
+  // the name this relay first assumed; it stays in case Buttondown uses it elsewhere.
+  if (code === "subscriber_blocked" || code === "firewall_blocked") return reply(400, { ok: false, error: "blocked" });
   if (upstream.status === 429) return reply(429, { ok: false, error: "busy" }, { "Retry-After": "60" });
   return reply(502, { ok: false, error: "unavailable" });
 }

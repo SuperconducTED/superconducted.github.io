@@ -154,3 +154,16 @@ tests, 15 of 15.
 - `relay/README.md`: deploy steps, filtered networks, the health check.
 - GitHub, events that trigger workflows (`schedule`):
   https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+
+## Correction (later on 2026-10-18)
+
+Two statements above went further than the evidence. The filter resets `curl`, Node and Wrangler,
+but after this PR merged a Chromium browser on the same filtered line reached the relay (the
+relay's own `400 invalid` for a malformed address), probably because Encrypted Client Hello hid
+the name from the filter. So "The relay was fine" and the filter as the cause of the first failed
+sign-up were not proven: that sign-up came from a browser too. A test sign-up from that browser
+with an address Buttondown's firewall refuses got `unavailable`, because Buttondown answers a
+firewall refusal with code `subscriber_blocked` and the relay only knew `firewall_blocked`. That
+is fixed and recorded in `2026-10-18-relay-firewall-code.md`. The fallback button and the health
+check are unaffected: the button appeared in that test, and the health check never reaches
+Buttondown.

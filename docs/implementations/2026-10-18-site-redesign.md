@@ -731,3 +731,10 @@ A sign-up from a line with Türk Telekom's opt-in Safe Internet family profile s
 relay cannot be reached at all and offer a button that posts the typed address to Buttondown's own
 page, and a daily GitHub workflow checks the live relay with requests that subscribe nobody. The
 record is `2026-10-18-relay-fallback-and-health-check.md`.
+
+## Later: Buttondown's firewall code (2026-10-18)
+
+Buttondown answers a firewall refusal with `400` and code `subscriber_blocked`, not the
+`firewall_blocked` this relay first assumed, so such refusals showed as "unavailable". Measured
+against the live API, fixed and pinned in tests; the record is
+`2026-10-18-relay-firewall-code.md`.
