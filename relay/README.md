@@ -82,6 +82,34 @@ should ever see the key.
 To turn the relay off again, empty `relay` in `hugo.toml`: the forms go back to posting to
 Buttondown in a new tab, which also remains the path for visitors without JavaScript.
 
+## When a visitor's network blocks it
+
+Some networks refuse every `workers.dev` address. Türk Telekom's opt-in "Güvenli İnternet" family
+profile does: it resets the connection during the TLS handshake, and a plain-HTTP request is
+redirected to `guvenliinternet.turktelekom.com.tr`. To the visitor the relay then looks broken
+while it is fine everywhere else. The forms handle it: when the relay cannot be reached at all,
+the message says the visitor's network did not let the page reach the service and offers a
+"Finish on Buttondown's page" button, which posts the typed address to Buttondown's own page in
+a new tab (the same button appears when the relay reports Buttondown unavailable or Buttondown's
+firewall refuses the address). To tell a filter from an outage on a given connection, open
+`http://superconducted-newsletter.superconducted.workers.dev/` in a browser: a Türk Telekom
+warning page means the line is filtered; `{"ok":false,"error":"not_found"}` means the relay is
+reachable.
+
+## Daily health check
+
+`.github/workflows/relay-health.yml` runs `scripts/check_relay.py` every day at 06:17 UTC, on
+request, and on pull requests that change either file. It sends three requests that the relay
+refuses before its rate limiter and before any call to Buttondown (a preflight from the site, a
+malformed address from the site, a request from another origin) and checks each answer, so a run
+subscribes nobody. When a scheduled run fails, GitHub emails the person who last changed the
+workflow's schedule. It cannot tell whether the Buttondown key still works; only a real sign-up
+shows that. To run it by hand:
+
+```bash
+python -I scripts/check_relay.py
+```
+
 ## Test
 
 ```bash

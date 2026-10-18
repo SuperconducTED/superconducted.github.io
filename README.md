@@ -108,7 +108,12 @@ Atom `id` is its permanent URL, which Buttondown uses to avoid sending a post tw
 With `params.newsletter.relay` set to the newsletter relay's `/subscribe` address (`relay/`, a
 Cloudflare Worker that holds the Buttondown API key; `relay/README.md` has the deployment steps),
 the forms subscribe on the page instead: no new tab, a real answer, Buttondown's double opt-in
-unchanged. Without script, or with `relay` empty, they post to Buttondown in a new tab.
+unchanged. Without script, or with `relay` empty, they post to Buttondown in a new tab. When the
+relay cannot be reached (some networks block `workers.dev` addresses, for example Türk Telekom's
+opt-in Safe Internet family profile), reports Buttondown unavailable, or meets Buttondown's spam
+firewall, the message carries a "Finish on Buttondown's page" button that posts the typed address
+to Buttondown in a new tab. The workflow `relay-health.yml` checks the live relay every day with
+requests that subscribe nobody (`scripts/check_relay.py`) and emails on failure.
 
 Setting the username also turns on the newsletter invitation: a card in the style of a consent
 pop-up (bottom left on wide screens, a bottom sheet on phones) that slides in shortly after a

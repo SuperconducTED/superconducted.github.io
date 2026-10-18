@@ -522,7 +522,8 @@ html:not(.js) .demo-chart { display: none; }
 .fineprint { font-size: 0.82rem; color: var(--text-2); margin: 0.75rem 0 0; }
 /* The relay's honeypot: off-screen and out of the tab order; people never see it, bots fill it. */
 .hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
-.field-error a { color: var(--accent); }
+/* The fallback button newsletter.js adds under a relay failure: on its own line, below the message. */
+.field-error .fallback { display: flex; width: fit-content; max-width: 100%; margin-top: 0.5rem; text-align: left; }
 .signup-done { display: none; }
 .signup.is-done .signup-form { display: none; }
 .signup.is-done .signup-done { display: block; }
