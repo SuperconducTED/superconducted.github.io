@@ -8,6 +8,13 @@ main = "src/index.js"
 compatibility_date = "2026-09-01"
 workers_dev = true
 
+# Cloudflare persists request logs for new Workers unless told otherwise (Wrangler's configuration
+# reference: observability "Defaults to `true` for all new Workers"), which would contradict the
+# sign-up form's promise that the relay logs nothing. Off. A change here reaches the live Worker
+# only with the next `wrangler deploy`.
+[observability]
+enabled = false
+
 [vars]
 # Only the website may call the relay. Add a local address while testing, never in production.
 ALLOWED_ORIGINS = "https://superconducted.github.io"

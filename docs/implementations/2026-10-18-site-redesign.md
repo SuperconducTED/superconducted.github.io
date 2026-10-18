@@ -712,3 +712,14 @@ Buttondown accepts the `source` and `language` metadata keys, which closes the o
 above. The confirmation email is the remaining check and is Mert's to see. (An earlier attempt
 with the guide's placeholder text left in place got `400 invalid` from the relay, as it should,
 before anything reached Buttondown.)
+
+## Later: security review of everything after `d74acb0` (2026-10-18)
+
+The security review above covered the branch only up to `d74acb0`. The code merged after it,
+including the newsletter pop-up and the relay, was reviewed separately after PR #7 merged: no high
+or medium findings; four lower observations fixed (Cloudflare's request logs, which are on by
+default for new Workers, switched off in `relay/wrangler.toml`; the visitor's IP going to
+Buttondown now disclosed in the fine print and the footer; two overstated claims in the relay's
+README and code comment corrected). The record is `2026-10-18-relay-security-review.md`. Statements
+above that the relay "logs nothing" hold on Cloudflare's side only once the Worker is deployed
+again with that config.
