@@ -61,7 +61,7 @@ jobs:
         # change cannot land untested. Node 20+ ships on the runner image.
         run: |
           node --version
-          node --test relay/test/
+          node --test relay/test/relay.test.js
 
       - name: Check
         run: |

@@ -80,7 +80,7 @@ Buttondown in a new tab, which also remains the path for visitors without JavaSc
 ## Test
 
 ```bash
-node --test relay/test/
+node --test relay/test/relay.test.js
 ```
 
 The tests run the Worker's handler in Node 20 or later with Buttondown replaced by a stub. CI runs

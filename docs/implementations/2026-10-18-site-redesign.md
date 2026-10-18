@@ -672,3 +672,33 @@ suppresses the elevation prompt, and `winget upgrade` keeps the `OpenJS.NodeJS.2
 config then passed `wrangler@4.145.0 deploy --dry-run` (run offline from the npx cache, nothing
 uploaded): a 4.61 KiB bundle with the `SIGNUP_LIMITER` rate limit (5 per 60 s) and both variables
 bound. Whether Mert's Cloudflare plan accepts that rate limit still shows only on the real deploy.
+
+## As built: the relay is live and the site points at it (2026-10-18)
+
+Mert deployed the Worker from his machine (`wrangler login`, `deploy`, and the
+`BUTTONDOWN_API_KEY` secret) after registering the `workers.dev` subdomain `superconducted`, so the
+relay answers at `https://superconducted-newsletter.superconducted.workers.dev/subscribe`. The
+deploy went through with the `[[ratelimits]]` block in place, so the plan accepted the binding.
+The address refused TLS for about ten minutes after the subdomain was registered (alert 40, no
+certificate yet) and then came up.
+
+Probed from outside with requests that stop before Buttondown, so no address was sent and no
+subscriber was created:
+
+| Request | Answer |
+|---|---|
+| `GET /` | 404 `not_found` |
+| `OPTIONS /subscribe` from `https://superconducted.github.io` | 204, `Access-Control-Allow-Origin` for that origin only, `Max-Age` 86400 |
+| `OPTIONS` or `POST /subscribe` from another origin | 403 `origin`, no CORS header |
+| `GET /subscribe` | 405, `Allow: POST, OPTIONS` |
+| `POST /subscribe` from the site with a malformed address | 400 `invalid`, `nosniff` |
+
+Not covered by these probes: that the secret is the right key with subscriber access, and the
+confirmation email. Both need one real address, Mert's own, through the check in `relay/README.md`.
+
+| File | Change |
+|---|---|
+| `hugo.toml` | `relay` set to the Worker's `/subscribe` address. Production build: all 17 site checks pass against the engine register on main; every page's `connect-src` is `'self'` plus the Worker's origin; the home page carries two relay-wired forms with two honeypots, How it works one. |
+| `.github/workflows/pages.yml`, `relay/package.json`, `relay/README.md` | Run `node --test` on `relay/test/relay.test.js`, not on the folder. From Node 21 on, a folder argument is loaded as a script and crashes (`Cannot find module ...\relay\test`), so the step as first written would have failed on any runner with Node 22 or later; it was never pushed, so CI never ran it. On Node 24.20.0: 14 of 14 pass through both the workflow command and `npm test`. |
+| `scripts/mutate_relay.py` | Same file argument, and the unmutated tests now run first: a crashing runner would otherwise report every planted fault as caught (the final check would still have failed, but only after six false `KILL` lines). With the folder form put back on a throwaway copy, the script stops at the baseline and says why; as committed, 6 of 6 faults are caught and the restored tests pass. |
+| `.gitignore` | Ignores `relay/.wrangler/` (Wrangler's cache, which holds the Cloudflare account details) and `relay/node_modules/`. |

@@ -3,10 +3,14 @@
 Usage:
     python -I scripts/mutate_relay.py
 
-Plants one fault at a time in relay/src/index.js, runs `node --test test/` in relay/, expects a
-failure, and writes the original bytes back (checked byte for byte). Exits 1 if any fault goes
-unnoticed, if a mutation no longer applies, or if the restored tests fail. Run it on a clean
-working tree; it needs Node 20 or later.
+Plants one fault at a time in relay/src/index.js, runs `node --test test/relay.test.js` in relay/,
+expects a failure, and writes the original bytes back (checked byte for byte). Exits 1 if the
+unmutated tests fail (checked first, so a broken runner cannot pass for a caught fault), if any
+fault goes unnoticed, if a mutation no longer applies, or if the restored tests fail. Run it on a
+clean working tree; it needs Node 20 or later.
+
+The test file is named, not its folder: Node 21 and later read a folder argument to --test as a
+script to run and crash, which under this script would look like every fault being caught.
 """
 import os
 import shutil
@@ -26,7 +30,11 @@ MUTATIONS = [
     ("raw address as limiter key", '"mail:" + (await sha256(email.toLowerCase()))', '"mail:" + email'),
     ("existing address revealed", 'code === "email_already_exists" || ', ""),
 ]
+TESTS = ["node", "--test", "test/relay.test.js"]
 original = open(src, "rb").read()
+baseline = subprocess.run(TESTS, cwd=f"{repo}/relay", capture_output=True, text=True)
+if baseline.returncode != 0:
+    sys.exit("the unmutated relay tests fail, so no mutation result would mean anything:\n" + baseline.stdout[-2000:] + baseline.stderr[-2000:])
 failures = 0
 try:
     for name, old, new in MUTATIONS:
@@ -36,7 +44,7 @@ try:
             failures += 1
             continue
         open(src, "wb").write(text.replace(old, new).encode("utf-8"))
-        p = subprocess.run(["node", "--test", "test/"], cwd=f"{repo}/relay", capture_output=True, text=True)
+        p = subprocess.run(TESTS, cwd=f"{repo}/relay", capture_output=True, text=True)
         killed = p.returncode != 0
         print(f"{'KILL' if killed else 'MISS'}  {name}")
         failures += 0 if killed else 1
@@ -44,6 +52,6 @@ try:
 finally:
     open(src, "wb").write(original)
 assert open(src, "rb").read() == original
-p = subprocess.run(["node", "--test", "test/"], cwd=f"{repo}/relay", capture_output=True, text=True)
+p = subprocess.run(TESTS, cwd=f"{repo}/relay", capture_output=True, text=True)
 print("restored, tests pass:", p.returncode == 0)
 sys.exit(1 if failures or p.returncode else 0)
