@@ -1,7 +1,8 @@
 ---
 title: "Başlarken"
+kicker: "Kurulum"
 description: "SuperconducTED gürültü motorunu kurun, testlerini çalıştırın, IBM kalibrasyonlarını toplayın ve projeye katılın."
-lead: "Motoru kurun, testlerini çalıştırın ve projeye nasıl katılabileceğinizi görün. Python 3.11 veya daha yeni bir sürüm ve git gerekir."
+lead: "Aşağıdaki komutlarla motoru kurup test takımını çalıştırın. Python 3.11 veya daha yeni bir sürüm ve git gerekir; her kod bloğunda bir Kopyala düğmesi var."
 toc: true
 ---
 
@@ -23,24 +24,27 @@ pip install -e . --no-deps
 
 ## Testleri çalıştırma
 
+Test takımında {{% claim "tests" %}} test var ve IBM hesabı gerekmez.
+
 ```bash
 pytest
 ```
 
 ## IBM kalibrasyonlarını toplama
 
-`superconducted-poll` komutu bir IBM arka ucundan kalibrasyon anlık görüntülerini arşivler. Bir
-IBM Quantum belirteci (token) gerekir.
+`superconducted-poll` bir IBM arka ucundan kalibrasyon anlık görüntülerini arşivler. Bir IBM
+Quantum belirteci (token) gerekir.
 
 ```bash
 cp .env.example .env
 superconducted-poll --backend ibm_fez
 ```
 
-Belirtecinizi `.env` dosyasına `IBM_QUANTUM_TOKEN` olarak yazın. `.env` dosyası git tarafından
-yok sayılır: gerçek bir belirteci asla işlemeyin (commit etmeyin). Motorun
-[README dosyası](https://github.com/SuperconducTED/superconducted-noise-engine#readme), toplama
-sırasında karşılaşılabilecek hataları ve çözümlerini listeler.
+- **Belirteç nereye yazılır:** `.env` dosyasına, `IBM_QUANTUM_TOKEN` olarak.
+- **Asla işlemeyin (commit etmeyin).** git `.env` dosyasını yok sayar; öyle kalsın.
+- **Toplama başarısız olursa** motorun
+  [README dosyası](https://github.com/SuperconducTED/superconducted-noise-engine#readme) hataları
+  ve çözümlerini listeler.
 
 ## Tasarımı okuma
 
@@ -50,13 +54,12 @@ sırasında karşılaşılabilecek hataları ve çözümlerini listeler.
   her mimari karar ve durumu.
 - [Sayısal iddialar kaydı](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/numerical-claims.md):
   projenin belirttiği her sayının nereden geldiği.
-- [Nasıl çalışır](../how-it-works/): fikir ve denklemler, bu sitede.
 
 ## Katılım
 
-Sorular ve fikirler motorun
-[Tartışmalar](https://github.com/SuperconducTED/superconducted-noise-engine/discussions)
-bölümüne, hatalar ise
-[konular](https://github.com/SuperconducTED/superconducted-noise-engine/issues) bölümüne yazılır.
-Büyük bir değişiklik için önce bir konu açın; böylece iş başlamadan yaklaşım üzerinde uzlaşılır.
-Kod MIT lisansı altındadır.
+- **Sorular ve fikirler:** motorun
+  [Tartışmalar](https://github.com/SuperconducTED/superconducted-noise-engine/discussions) bölümü.
+- **Hatalar:** [konular](https://github.com/SuperconducTED/superconducted-noise-engine/issues)
+  bölümü.
+- **Büyük bir değişiklik:** önce bir konu açın; böylece iş başlamadan yaklaşım üzerinde ekiple
+  uzlaşırsınız. Kod MIT lisansı altındadır.

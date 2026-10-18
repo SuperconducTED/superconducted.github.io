@@ -1,0 +1,29 @@
+{{ define "main" }}
+{{- /* The Updates list: newest first, 10 per page (hugo.toml [pagination]). */ -}}
+<article class="page wrap">
+  <header class="page-head">
+    {{- with .Params.kicker }}<p class="kicker">{{ . }}</p>{{ end }}
+    <h1>{{ .Title }}</h1>
+    {{- with .Params.lead }}<p class="lead">{{ partial "fmt.html" (dict "page" $ "text" .) }}</p>{{ end }}
+  </header>
+  <div class="updates-grid">
+    <div>
+      {{- $pager := .Paginate .RegularPages }}
+      {{- with $pager.Pages }}
+      {{- partial "post-list.html" . }}
+      {{- else }}
+      <p class="empty">{{ T "updates_empty" }}</p>
+      {{- end }}
+      {{- if gt $pager.TotalPages 1 }}
+      <nav class="pager" aria-label="{{ T "pager_label" }}">
+        {{- with $pager.Prev }}<a class="button" href="{{ .URL }}" rel="prev">{{ partial "icon.html" "arrow-left" }}{{ T "pager_newer" }}</a>{{ else }}<span></span>{{ end }}
+        <span class="small">{{ T "pager_status" (dict "n" $pager.PageNumber "of" $pager.TotalPages) }}</span>
+        {{- with $pager.Next }}<a class="button" href="{{ .URL }}" rel="next">{{ T "pager_older" }}{{ partial "icon.html" "arrow-right" }}</a>{{ else }}<span></span>{{ end }}
+      </nav>
+      {{- end }}
+    </div>
+    <div>{{ partial "signup.html" . }}</div>
+  </div>
+</article>
+{{ end }}
+

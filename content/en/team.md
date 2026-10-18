@@ -1,7 +1,8 @@
 ---
 title: "Team"
+kicker: "People"
 description: "The students who build SuperconducTED at TED University in Ankara, and their faculty advisor."
-lead: "SuperconducTED is built by undergraduate students at TED University in Ankara, with a faculty advisor. Each student owns parts of the engine and reviews the others' work."
+lead: "Four senior students at TED University in Ankara build the engine, with a faculty advisor. Each student owns modules and reviews the others' work, so every change gets a second pair of eyes."
 layout: team
 ---
 

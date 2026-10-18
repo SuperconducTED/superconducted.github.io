@@ -1,0 +1,24 @@
+{{ define "main" }}
+{{- /* One update. Front matter: title, date, description (the summary in lists and the feed), lead. */ -}}
+<article class="page wrap">
+  <a class="back" href="{{ .CurrentSection.RelPermalink }}">{{ partial "icon.html" "arrow-left" }}{{ T "updates_all" }}</a>
+  <header class="post-head">
+    <span class="post-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format ":date_long" .Date }}</time> · {{ T "reading_time" (dict "n" .ReadingTime) }}</span>
+    <h1>{{ .Title }}</h1>
+    {{- with .Params.lead }}<p class="lead">{{ partial "fmt.html" (dict "page" $ "text" .) }}</p>{{ end }}
+  </header>
+  <div class="prose">
+    {{ .Content }}
+  </div>
+  <footer class="post-foot">
+    {{- if or .PrevInSection .NextInSection }}
+    <nav class="pager" aria-label="{{ T "pager_label" }}">
+      {{- with .NextInSection }}<a class="button" href="{{ .RelPermalink }}" rel="next">{{ partial "icon.html" "arrow-left" }}{{ .Title }}</a>{{ else }}<span></span>{{ end }}
+      {{- with .PrevInSection }}<a class="button" href="{{ .RelPermalink }}" rel="prev">{{ .Title }}{{ partial "icon.html" "arrow-right" }}</a>{{ else }}<span></span>{{ end }}
+    </nav>
+    {{- end }}
+    {{ partial "signup.html" . }}
+  </footer>
+</article>
+{{ end }}
+

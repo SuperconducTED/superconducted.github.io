@@ -5,13 +5,21 @@
 </head>
 <body class="kind-{{ .Kind }}{{ with .Layout }} layout-{{ . }}{{ end }}">
   <a class="skip" href="#main">{{ T "skip" }}</a>
+  {{- partial "newsletter-popup.html" . }}
   {{- partial "header.html" . }}
+  <p class="print-only wrap">SuperconducTED · {{ .Permalink }}</p>
   <main id="main" tabindex="-1">
     {{- block "main" . }}{{ end }}
   </main>
   {{- partial "footer.html" . }}
-  {{- $theme := resources.Get "js/theme.js" | minify | fingerprint }}
-  <script src="{{ $theme.RelPermalink }}" integrity="{{ $theme.Data.Integrity }}" defer></script>
+  {{- partial "fab.html" . }}
+  {{- partial "search-dialog.html" . }}
+  {{- $site := partial "js.html" "site" }}
+  <script src="{{ $site.RelPermalink }}" integrity="{{ $site.Data.Integrity }}" defer></script>
+  {{- if site.Params.newsletter.buttondown }}
+  {{- $nl := partial "js.html" "newsletter" }}
+  <script src="{{ $nl.RelPermalink }}" integrity="{{ $nl.Data.Integrity }}" defer></script>
+  {{- end }}
   {{- block "scripts" . }}{{ end }}
 </body>
 </html>

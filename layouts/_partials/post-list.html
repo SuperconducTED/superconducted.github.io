@@ -1,0 +1,12 @@
+{{- /* A list of update posts. Context: a slice of pages. */ -}}
+<ul class="post-list">
+  {{- range . }}
+  <li class="post-item">
+    <a class="post-link" href="{{ .RelPermalink }}">
+      <span class="post-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format ":date_long" .Date }}</time> · {{ T "reading_time" (dict "n" .ReadingTime) }}</span>
+      <span class="post-title">{{ .Title }}</span>
+      {{- with .Description }}<span class="post-summary">{{ . }}</span>{{ end }}
+    </a>
+  </li>
+  {{- end }}
+</ul>

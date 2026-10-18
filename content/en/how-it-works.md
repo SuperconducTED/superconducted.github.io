@@ -1,67 +1,75 @@
 ---
 title: "How it works"
-description: "How SuperconducTED aims to turn a quantum computer's drifting calibration record into a noise range for Qiskit Aer: the idea in plain words, then the equations."
-lead: "A quantum computer's noise is measured again many times a day, and it keeps moving. This page explains, first in plain words and then in equations, how SuperconducTED aims to turn that moving record into a range a simulation can use."
+kicker: "Method"
+description: "How SuperconducTED turns a quantum computer's drifting calibration record into noise parameters for Qiskit Aer: the idea in plain words, then the equations."
+lead: "The first four sections give you the idea in plain words. The equations follow, so you can check the mathematics against the engine's code."
 toc: true
 math: true
 ---
 
-## A moving machine
+## The machine moves
 
-IBM measures the noise of each of its quantum computers many times a day: how long each qubit
-keeps its state (T1 and T2), how often a gate goes wrong, how often a measurement is misread.
-These numbers are not fixed. They drift as the chip and its refrigerator change, sometimes
-slowly, sometimes in jumps.
+IBM publishes calibration data for each of its quantum computers: how long each qubit keeps
+its state (T1 and T2), how often each gate fails, how often a measurement is misread.
 
-Simulators need those numbers. In Qiskit, `NoiseModel.from_backend` builds a noise model from
-the machine's latest calibration. That model is exact for the moment it was taken and quietly
-wrong as soon as the machine moves on, and nothing in the simulation says how wrong.
+- **The numbers drift**, sometimes slowly and sometimes in jumps, as the chip and its
+  refrigerator change.
+- **The evidence is on the [home page](../):** real T1 calibrations of one qubit on
+  `ibm_fez`, from May to October 2026.
 
-## What the engine does
+Qiskit's `NoiseModel.from_backend` copies the latest calibration into a noise model. That model
+is exact for its moment, and nothing in your simulation shows how far the machine has moved
+since.
 
-SuperconducTED sits between the calibration data and Qiskit Aer, the simulator. Every
-calibration snapshot goes through seven stages:
+## The pipeline in seven stages
 
-1. **Ingest.** The snapshot is archived. Since May 2026 a scheduled job has collected the
-   calibrations of one IBM machine, `ibm_fez`, into a public archive.
-2. **Summarise.** Three features describe the snapshot: the mean T1, the mean T2 and the mean
-   readout error across the chip.
-3. **Fuzzify and fire rules.** Each feature is described by overlapping fuzzy sets, such as
-   "low", "typical" and "high". Every combination of sets is a rule, and each rule fires as
-   strongly as the snapshot matches it.
+SuperconducTED sits between the calibration data and Qiskit Aer, the simulator. Each snapshot
+goes through seven stages:
+
+1. **Ingest.** A scheduled job archives the calibrations of IBM's `ibm_fez`, in public, since
+   May 2026.
+2. **Summarise.** Three features describe the snapshot: mean T1, mean T2 and mean readout error.
+3. **Fuzzify.** Overlapping fuzzy sets ("low", "typical", "high") describe each feature. Every
+   combination of sets is a rule, and each rule fires as strongly as the snapshot matches it.
 4. **Combine.** Each rule proposes noise parameters as a linear function of the features; the
    engine averages the proposals, weighted by how strongly each rule fired.
-5. **Squash.** The result is mapped into the range a physical parameter can take.
-6. **Check eligibility.** Only gates that the snapshot actually reports get a noise channel.
-7. **Project.** The parameters become a quantum channel (amplitude and phase damping) that Aer
-   can simulate.
+5. **Squash.** The result is mapped into the range the physical parameter can take.
+6. **Check eligibility.** Only gates that the snapshot reports get a noise channel.
+7. **Project.** The parameters become amplitude and phase damping channels that Aer simulates.
 
-The rule base is a Takagi-Sugeno-Kang (TSK) fuzzy system. Training, now in progress, learns its
-sets and rules from the archive with ANFIS, a method that trains a fuzzy system the way a small
-neural network is trained.
+The rule base is a Takagi-Sugeno-Kang (TSK) fuzzy system. ANFIS trains it the way a small neural
+network is trained.
 
 ## Why a range
 
-One calibration is one sample of a machine that keeps moving. A fuzzy system can carry the
-uncertainty of its own inputs: an interval type-2 fuzzy set has a lower and an upper membership,
-and the space between them holds what is not known. Run as an ensemble of noise models that
-spans that uncertainty, a simulation returns a range of outcomes instead of one number. The aim
-is a range that brackets what the real hardware does across calibration cycles, which a single
-frozen model cannot do.
+One calibration is one sample of a machine that keeps moving.
+
+- **An interval type-2 fuzzy set** has a lower and an upper membership. The gap between them
+  holds what is not known about the input.
+- **An ensemble of noise models** that spans that uncertainty turns one simulation into a range
+  of outcomes.
+- **The aim** is a range that brackets what the hardware does across calibration cycles.
 
 ## Where it stands
 
-> SuperconducTED is a research preview. What follows is the state of the engine, not a result.
+> Research preview. This section reports the engine's state, not a result.
 
-- **Working today:** the calibration archive, feature extraction, the fuzzy pipeline from end to
-  end, channel projection, and an ensemble of Aer noise models.
-- **In progress:** training the rule base on the archive. Training needs enough distinct device
-  states: at least five per trainable parameter, 1,170 in all (register row NC-045).
-- **Open:** how the ensemble's members are made to differ (ADR-015), how their results are
-  combined into an interval (ADR-016), and whether the type-1 or the interval type-2 path is used
-  (ADR-009). Until these are settled, the engine's outputs are point estimates.
+- **Working:** the calibration archive, feature extraction, the fuzzy pipeline end to end,
+  channel projection, and an ensemble of Aer noise models. The suite has
+  {{% claim "tests" %}} tests.
+- **In progress:** training. The ridge least-squares fit of the rule outputs merged on
+  15 October 2026 [PR #114](https://github.com/SuperconducTED/superconducted-noise-engine/pull/114).
+  Training needs five distinct device states per trainable parameter,
+  {{% claim "floor" %}} in all; {{% claim "states" %}} are archived.
+- **Open:** how ensemble members differ
+  [ADR-015](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/decisions.md),
+  how their results combine into an interval
+  [ADR-016](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/decisions.md),
+  and type-1 or interval type-2
+  [ADR-009](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/decisions.md).
+  Until these land, the outputs are point estimates.
 
-Every design decision is recorded in the engine's
+Every design decision is in the engine's
 [decision record](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/decisions.md),
 the design in its
 [architecture document](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/architecture.md),
@@ -70,8 +78,8 @@ and every figure in its
 
 ## The equations
 
-For readers who want the mathematics. The definitions are the ones in the engine's code
-(`fuzzy/membership.py`, `fuzzy/tsk.py`, `fuzzy/defuzzification.py`, `channels/kraus.py`).
+The definitions match the engine's code (`fuzzy/membership.py`, `fuzzy/tsk.py`,
+`fuzzy/defuzzification.py`, `channels/kraus.py`).
 
 **Features.** A snapshot gives \(x = (x_1, x_2, x_3)\): the mean T1, the mean T2 and the mean
 readout error.
@@ -103,8 +111,9 @@ $$
 y(x) = \frac{\sum_{r=1}^{R} w_r(x)\, y_r(x)}{\sum_{r=1}^{R} w_r(x)}
 $$
 
-With three sets per feature there are \(R = 3^3 = 27\) rules and 234 trainable parameters: 216
-in the matrices \(A_r\), and 18 centres and widths (register rows NC-037 and NC-045).
+With three sets per feature there are \(R = 3^3 = 27\) rules and {{% claim "params" %}}
+trainable parameters: 216 in the matrices \(A_r\), and 18 centres and widths
+[NC-037](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/numerical-claims.md).
 
 **Channel.** Squashing turns \(y\) into an amplitude-damping parameter \(\gamma\) and a
 phase-damping parameter \(\lambda\), both in \([0, 1]\). Each eligible gate then gets amplitude
@@ -129,7 +138,6 @@ y(x) = \frac{1}{2}\left(
 \right)
 $$
 
-**The range.** The range the engine reports is planned to come from the ensemble: \(N\) noise
-models (32 by default, register row NC-018), each simulated, with their results combined into an
-interval. How the members differ and how their results are combined are the open decisions
-above.
+**The range.** The plan is for the range to come from the ensemble: \(N\) noise models
+({{% claim "ensemble" %}} by default), each simulated, with their results combined into an
+interval. How the members differ and how their results combine are the open decisions above.

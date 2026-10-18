@@ -1,0 +1,13 @@
+{{- /* Returns a map from claim key to the Markdown that prints it: the registered value, formatted
+for the current language, then its register row as a link (drawn as a proof chip by
+_markup/render-link.html). Keys: every entry of data/facts.yaml and data/claims.yaml, plus
+KEY_of for a fact's "of" total. Call with partialCached "claims-map.html" . site.Language.Lang. */ -}}
+{{- $m := dict }}
+{{- $reg := site.Params.register }}
+{{- range (hugo.Data.facts.facts | append hugo.Data.claims.claims) }}
+{{- $m = merge $m (dict .key (printf "%s [%s](%s)" (lang.FormatNumber 0 .value) .nc $reg)) }}
+{{- end }}
+{{- range hugo.Data.facts.facts }}{{ if .of }}
+{{- $m = merge $m (dict (printf "%s_of" .key) (printf "%s [%s](%s)" (lang.FormatNumber 0 .of) .of_nc $reg)) }}
+{{- end }}{{ end }}
+{{- return $m }}

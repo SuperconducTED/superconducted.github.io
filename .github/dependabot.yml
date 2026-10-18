@@ -1,0 +1,12 @@
+# Keeps the commit-pinned GitHub Actions in .github/workflows/ current: Dependabot opens a pull
+# request when a pinned action has a new release, and the Pages workflow checks it like any
+# other change. Hugo itself is pinned by version and checksum in pages.yml and is upgraded by
+# hand (its embedded KaTeX must match static/katex/; see README.md).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci

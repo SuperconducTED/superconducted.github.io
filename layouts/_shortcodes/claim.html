@@ -1,0 +1,4 @@
+{{- /* {{% claim "KEY" %}} in Markdown: the registered value and its proof chip (claims-map.html).
+Use the % form so the output link is rendered as Markdown. */ -}}
+{{- $map := partialCached "claims-map.html" . site.Language.Lang }}
+{{- with index $map (.Get 0) }}{{ . }}{{ else }}{{ errorf "claim shortcode: unknown key %q in %s" ($.Get 0) $.Page.File.Path }}{{ end -}}

@@ -1,0 +1,12 @@
+{{- /* Expandable answers: <details>/<summary>, so they open without script; print expands them
+(assets/js/site.js). Context: the page; items come from its front matter (faq.items: q, a). */ -}}
+{{- with .Params.faq }}
+<div class="faq">
+  {{- range .items }}
+  <details>
+    <summary>{{ .q }}<span class="plus" aria-hidden="true"></span></summary>
+    <div class="faq-answer">{{ partial "fmt.html" (dict "page" $ "text" .a "block" true) }}</div>
+  </details>
+  {{- end }}
+</div>
+{{- end }}

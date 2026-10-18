@@ -1,0 +1,7 @@
+{{- /* Three-way theme control. "System" follows the operating system and clears the saved choice;
+"Light" and "Dark" save it (assets/js/site.js). aria-pressed marks the active option. */ -}}
+<div class="theme-switch needs-js" role="group" aria-label="{{ T "theme_label" }}">
+  <button type="button" data-theme-set="light" aria-pressed="false" title="{{ T "theme_light" }}"><span class="visually-hidden">{{ T "theme_light" }}</span>{{ partial "icon.html" "sun" }}</button>
+  <button type="button" data-theme-set="system" aria-pressed="true" title="{{ T "theme_system" }}"><span class="visually-hidden">{{ T "theme_system" }}</span>{{ partial "icon.html" "system" }}</button>
+  <button type="button" data-theme-set="dark" aria-pressed="false" title="{{ T "theme_dark" }}"><span class="visually-hidden">{{ T "theme_dark" }}</span>{{ partial "icon.html" "moon" }}</button>
+</div>

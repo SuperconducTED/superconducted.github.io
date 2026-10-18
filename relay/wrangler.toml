@@ -1,0 +1,26 @@
+# Cloudflare Worker configuration for the newsletter relay (relay/README.md has the steps).
+# The Buttondown API key is a secret, set with `wrangler secret put BUTTONDOWN_API_KEY`; it is
+# never written in this file or anywhere else in the repository.
+name = "superconducted-newsletter"
+main = "src/index.js"
+# Kept well before the pinned Wrangler's release (4.145.0, 2026-09-30): Wrangler refuses a date
+# newer than its bundled runtime knows.
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+# Only the website may call the relay. Add a local address while testing, never in production.
+ALLOWED_ORIGINS = "https://superconducted.github.io"
+BUTTONDOWN_API = "https://api.buttondown.com/v1/subscribers"
+
+# Rate limits: at most 5 sign-up attempts per visitor IP and per address in 60 seconds, per
+# Cloudflare location (approximate by Cloudflare's own description). Needs Wrangler 4.36.0 or
+# later. If deploying on your plan rejects this block, delete it: the relay then relies on its
+# honeypot and Buttondown's spam firewall, and the code works without the binding.
+[[ratelimits]]
+name = "SIGNUP_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60

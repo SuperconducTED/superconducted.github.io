@@ -1,0 +1,52 @@
+# Claude Code security review (anthropics/claude-code-security-review) on pull requests: Claude
+# reads the diff and comments on the lines it finds vulnerable.
+#   * Inert until an org owner adds the repository secret CLAUDE_API_KEY (an Anthropic API key
+#     enabled for both the Claude API and Claude Code). Without it the job notes that it skipped.
+#     Each run is billed to that key.
+#   * Same-repository pull requests only. The action is not hardened against prompt injection,
+#     so pull requests from forks never reach it (they would get no secrets anyway); the owner
+#     should also keep "Require approval for all external contributors" on.
+#   * The model is set explicitly: the action's default (claude-opus-4-1-20250805) retired on
+#     2026-08-05. At the pinned commit the action's optional second-stage API filter still
+#     probes access with a retired model and turns itself off when that probe fails; the main
+#     Claude Code scan and its comments are unaffected.
+#   * The action has no releases, so it is pinned to the newest commit on its main branch.
+name: Security review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: security-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HAS_KEY: ${{ secrets.CLAUDE_API_KEY != '' }}
+    steps:
+      - name: Skip without the API key
+        if: env.HAS_KEY != 'true'
+        run: echo "::notice::CLAUDE_API_KEY is not set, so the Claude Code security review was skipped."
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.HAS_KEY == 'true'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - uses: anthropics/claude-code-security-review@0c6a49f1fa56a1d472575da86a94dbc1edb78eda # main, 2026-02-11
+        if: env.HAS_KEY == 'true'
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}
+          claude-model: claude-opus-5-5
+          exclude-directories: static

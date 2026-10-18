@@ -1,0 +1,10 @@
+{{- /* One script from assets/js/, minified by Hugo's built-in esbuild and fingerprinted (SHA-256,
+so .Data.Integrity is the SRI value and, for the inline theme boot, the CSP hash). Usage:
+{{ $r := partial "js.html" "site" }}. Published as /js/<name>.min.<sha256>.js, the name site.js's
+loader expects for the search script.
+Why esbuild and not Hugo's `minify`: hugo.toml sets minify.disableJS so the HTML minifier leaves
+the inline theme boot byte for byte as hashed; Hugo's JS minifier was not idempotent (it renamed
+variables again on the second pass), which silently broke the CSP hash. esbuild minification does
+not depend on that setting. */ -}}
+{{- $opts := dict "minify" true "target" "es2017" "format" "iife" "targetPath" (printf "js/%s.min.js" .) }}
+{{- return (resources.Get (printf "js/%s.js" .) | js.Build $opts | fingerprint "sha256") -}}

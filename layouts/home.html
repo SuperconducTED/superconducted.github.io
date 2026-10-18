@@ -1,88 +1,194 @@
 {{ define "main" }}
-<section class="hero wrap">
-  <div class="hero-mark">
-    <img class="on-light" src="{{ "brand/mark-on-light.svg" | absURL }}" alt="" width="1024" height="1024">
-    <img class="on-dark" src="{{ "brand/mark-on-dark.svg" | absURL }}" alt="" width="1024" height="1024">
-  </div>
-  <div class="hero-text">
-    <h1>SuperconducTED</h1>
-    <p class="tagline" lang="en">{{ site.Params.tagline }}</p>
-    <p class="lead">{{ .Params.lead }}</p>
-    <p class="actions">
-      <a class="button primary" href="{{ relLangURL "how-it-works/" }}">{{ T "cta_how" }}</a>
-      <a class="button" href="{{ relLangURL "get-started/" }}">{{ T "cta_start" }}</a>
-      <a class="button" href="{{ site.Params.repo }}">{{ T "cta_repo" }}</a>
-    </p>
+{{- /* Home. Copy lives in content/<lang>/_index.md front matter; this template is layout only.
+Order follows the reader's questions: what is it and why should I care (hero, with the real
+drift chart as its proof), why does it matter, how does it work, how far along is it (with the
+register-backed facts as proof), what is still in doubt (FAQ, before the last call to action),
+how do I follow it, what do I do now. */ -}}
+{{- $p := .Params }}
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="rise">
+      <p class="eyebrow"><span class="pulse" aria-hidden="true"></span>{{ $p.hero.eyebrow }}</p>
+      <h1 class="display" id="hero-title">{{ $p.hero.title_before }} <span class="range-word">{{ $p.hero.title_range }}</span> {{ $p.hero.title_after }}</h1>
+      <p class="hero-sub">{{ (partial "fmt.html" (dict "page" $ "text" $p.hero.sub)) }}</p>
+      <p class="actions">
+        <a class="button primary" href="{{ relLangURL $p.hero.primary.url }}">{{ $p.hero.primary.label }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</a>
+        <a class="button" href="{{ relLangURL $p.hero.secondary.url }}">{{ $p.hero.secondary.label }}</a>
+      </p>
+      <p class="hero-note">{{ (partial "fmt.html" (dict "page" $ "text" $p.hero.note)) }}</p>
+    </div>
+
+    {{- with hugo.Data.drift }}
+    {{- $pts := .points }}
+    {{- $first := index $pts 0 }}
+    {{- $last := index $pts (sub (len $pts) 1) }}
+    {{- $vals := slice }}{{ range $pts }}{{ $vals = $vals | append (index . 1) }}{{ end }}
+    {{- $from := time.Format ":date_long" (time.AsTime (index $first 0)) }}
+    {{- $to := time.Format ":date_long" (time.AsTime (index $last 0)) }}
+    <figure class="readout" aria-labelledby="demo-title">
+      <div class="readout-head" aria-hidden="true"><span><span lang="en">{{ .source.backend }}</span> · {{ T "demo_qubit" }} {{ .qubit }}</span><span>T1 · <span class="unit">µs</span></span></div>
+      <div class="demo-chart" id="drift-chart" role="img"
+           aria-label="{{ T "demo_summary" (dict "qubit" .qubit "min" (lang.FormatNumber 1 (math.Min $vals)) "max" (lang.FormatNumber 1 (math.Max $vals)) "n" (len $pts) "first" (lang.FormatNumber 1 (index $first 1))) }}"
+           data-label-measured="{{ T "demo_measured" }}" data-label-frozen="{{ T "demo_frozen" }}"
+           data-label-band="{{ T "demo_band" }}" data-label-y="{{ T "demo_axis_y" }}"
+           data-locale="{{ site.Language.Locale }}"></div>
+      <figcaption>
+        <p class="visually-hidden" id="demo-title">{{ T "demo_title" }}</p>
+        <ul class="legend" aria-hidden="true">
+          <li class="lg-measured">{{ T "demo_measured" }}</li>
+          <li class="lg-frozen">{{ T "demo_frozen" }}</li>
+          <li class="lg-band">{{ T "demo_band" }}</li>
+        </ul>
+        <p>{{ T "demo_caption" (dict "qubit" .qubit "backend" .source.backend "from" $from "to" $to "window" .band.window_days) }}</p>
+        <div class="readout-foot">
+          <a class="small" href="https://github.com/SuperconducTED/superconducted-noise-engine/tree/{{ .source.ref }}/health">{{ T "demo_source" (dict "ref" (substr .source.ref 0 7)) }}</a>
+          <button class="button ghost small replay" type="button" id="drift-replay" hidden>{{ T "demo_replay" }}</button>
+        </div>
+      </figcaption>
+      <script type="application/json" id="drift-data">{{ jsonify (dict "points" .points "qubit" .qubit) | safeJS }}</script>
+    </figure>
+    {{- end }}
   </div>
 </section>
 
-<aside class="notice wrap" role="note" aria-labelledby="preview-title">
-  <p><strong id="preview-title">{{ T "preview_title" }}.</strong> {{ T "preview_text" }}</p>
-</aside>
+<section class="section" aria-labelledby="problem-title">
+  <div class="wrap">
+    <header class="section-head reveal">
+      <p class="kicker">{{ $p.problem.kicker }}</p>
+      <h2 id="problem-title">{{ $p.problem.title }}</h2>
+      <p>{{ (partial "fmt.html" (dict "page" $ "text" $p.problem.intro)) }}</p>
+    </header>
+    <ol class="cards three">
+      {{- range $i, $s := $p.problem.steps }}
+      <li class="card reveal">
+        <span class="card-index" aria-hidden="true">0{{ add $i 1 }}</span>
+        <h3>{{ $s.title }}</h3>
+        <p>{{ (partial "fmt.html" (dict "page" $ "text" $s.text)) }}</p>
+      </li>
+      {{- end }}
+    </ol>
+  </div>
+</section>
 
-{{- with hugo.Data.drift }}
-{{- $pts := .points }}
-{{- $first := index $pts 0 }}
-{{- $last := index $pts (sub (len $pts) 1) }}
-{{- $vals := slice }}{{ range $pts }}{{ $vals = $vals | append (index . 1) }}{{ end }}
-{{- $from := time.Format ":date_long" (time.AsTime (index $first 0)) }}
-{{- $to := time.Format ":date_long" (time.AsTime (index $last 0)) }}
-<section class="demo wrap" aria-labelledby="demo-title">
-  <h2 id="demo-title">{{ T "demo_title" }}</h2>
-  <figure>
-    <div class="demo-chart" id="drift-chart" role="img"
-         aria-label="{{ T "demo_summary" (dict "qubit" .qubit "min" (lang.FormatNumber 1 (math.Min $vals)) "max" (lang.FormatNumber 1 (math.Max $vals)) "n" (len $pts) "first" (lang.FormatNumber 1 (index $first 1))) }}"
-         data-label-measured="{{ T "demo_measured" }}" data-label-frozen="{{ T "demo_frozen" }}"
-         data-label-band="{{ T "demo_band" }}" data-label-y="{{ T "demo_axis_y" }}"
-         data-locale="{{ site.Language.Locale }}"></div>
-    <figcaption>
-      <ul class="legend" aria-hidden="true">
-        <li class="lg-measured">{{ T "demo_measured" }}</li>
-        <li class="lg-frozen">{{ T "demo_frozen" }}</li>
-        <li class="lg-band">{{ T "demo_band" }}</li>
+<section class="section" aria-labelledby="approach-title">
+  <div class="wrap split">
+    <div>
+      <header class="section-head reveal">
+        <p class="kicker">{{ $p.approach.kicker }}</p>
+        <h2 id="approach-title">{{ $p.approach.title }}</h2>
+        <p>{{ (partial "fmt.html" (dict "page" $ "text" $p.approach.intro)) }}</p>
+      </header>
+      <ol class="points">
+        {{- range $i, $s := $p.approach.points }}
+        <li class="reveal">
+          <span class="point-n" aria-hidden="true">0{{ add $i 1 }}</span>
+          <h3>{{ $s.title }}</h3>
+          <p>{{ (partial "fmt.html" (dict "page" $ "text" $s.text)) }}</p>
+        </li>
+        {{- end }}
+      </ol>
+      <p class="actions"><a class="button" href="{{ relLangURL $p.approach.link.url }}">{{ $p.approach.link.label }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</a></p>
+    </div>
+    <div class="mark-frame reveal" aria-hidden="true">
+      {{- partial "brand-img.html" (dict "name" "mark" "w" 1024 "h" 1024) }}
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="status-title">
+  <div class="wrap">
+    <header class="section-head reveal">
+      <p class="kicker">{{ $p.status.kicker }}</p>
+      <h2 id="status-title">{{ $p.status.title }}</h2>
+      <p>{{ (partial "fmt.html" (dict "page" $ "text" $p.status.intro)) }}</p>
+    </header>
+    <div class="status">
+      {{- range $col := slice (dict "key" "working" "state" "done") (dict "key" "progress" "state" "half") (dict "key" "open" "state" "open") }}
+      {{- with index $p.status $col.key }}
+      <div class="status-col card reveal">
+        <h3><span class="state {{ $col.state }}" aria-hidden="true"></span>{{ .title }}</h3>
+        <ul>
+          {{- range .items }}<li>{{ (partial "fmt.html" (dict "page" $ "text" .)) }}</li>{{ end }}
+        </ul>
+      </div>
+      {{- end }}
+      {{- end }}
+    </div>
+    <p class="status-note">{{ (partial "fmt.html" (dict "page" $ "text" $p.status.note)) }}</p>
+
+    <div class="facts reveal" aria-labelledby="facts-title">
+      <h3 class="facts-title" id="facts-title">{{ T "facts_title" }}</h3>
+      <ul class="fact-list">
+        {{- range hugo.Data.facts.facts }}
+        {{- if or (not .pending) (not hugo.IsProduction) }}
+        <li{{ if .pending }} class="pending"{{ end }}>
+          <p class="fact-value">{{ lang.FormatNumber 0 .value }}{{ with .of }} <span class="fact-of">{{ T "fact_of" }} {{ lang.FormatNumber 0 . }}</span>{{ end }}</p>
+          {{- if .of }}
+          <svg class="meter" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true"><rect class="m-track" width="100" height="6" rx="3"/><rect class="m-fill" width="{{ math.Round (mul 100.0 (div (float .value) (float .of))) }}" height="6" rx="3"/></svg>
+          {{- end }}
+          <p class="fact-label">{{ T .label }}</p>
+          <p class="fact-source small">
+            {{- if .pending }}{{ T "fact_pending" }}{{ else }}<a class="proof" href="{{ site.Params.register }}">{{ .nc }}</a>{{ end }}
+            {{- with .of_nc }} <a class="proof" href="{{ site.Params.register }}">{{ . }}</a>{{ end }}
+            · {{ T "as_of" }} {{ time.Format ":date_medium" .as_of }}</p>
+        </li>
+        {{- end }}
+        {{- end }}
       </ul>
-      <p>{{ T "demo_caption" (dict "qubit" .qubit "backend" .source.backend "from" $from "to" $to "window" .band.window_days) }}</p>
-      <p class="small"><a href="https://github.com/SuperconducTED/superconducted-noise-engine/tree/{{ .source.ref }}/health">{{ T "demo_source" (dict "ref" (substr .source.ref 0 7)) }}</a></p>
-      <p><button class="button small-button" type="button" id="drift-replay" hidden>{{ T "demo_replay" }}</button></p>
-    </figcaption>
-  </figure>
-  <script type="application/json" id="drift-data">{{ jsonify (dict "points" .points "qubit" .qubit) | safeJS }}</script>
-</section>
-{{- end }}
-
-<section class="steps wrap" aria-labelledby="steps-title">
-  <h2 id="steps-title">{{ T "steps_title" }}</h2>
-  <ol class="step-list">
-    {{- range .Params.steps }}
-    <li>
-      <h3>{{ .title }}</h3>
-      <p>{{ .text | markdownify }}</p>
-    </li>
-    {{- end }}
-  </ol>
+      <p class="small">{{ T "facts_note" }}</p>
+    </div>
+  </div>
 </section>
 
-<section class="facts wrap" aria-labelledby="facts-title">
-  <h2 id="facts-title">{{ T "facts_title" }}</h2>
-  <ul class="fact-list">
-    {{- range hugo.Data.facts.facts }}
-    {{- if or (not .pending) (not hugo.IsProduction) }}
-    <li{{ if .pending }} class="pending"{{ end }}>
-      <p class="fact-value">{{ lang.FormatNumber 0 .value }}{{ with .of }} <span class="fact-of">{{ T "fact_of" }} {{ lang.FormatNumber 0 . }}</span>{{ end }}</p>
-      <p class="fact-label">{{ T .label }}</p>
-      <p class="fact-source small">
-        {{- if .pending }}{{ T "fact_pending" }}{{ else }}<a href="{{ site.Params.register }}">{{ .nc }}</a>{{ end }}
-        {{- with .of_nc }} · <a href="{{ site.Params.register }}">{{ . }}</a>{{ end }}
-        · {{ T "as_of" }} {{ time.Format ":date_medium" .as_of }}</p>
-    </li>
-    {{- end }}
-    {{- end }}
-  </ul>
-  <p class="small">{{ T "facts_note" }}</p>
+<section class="section" aria-labelledby="faq-title">
+  <div class="wrap">
+    <header class="section-head reveal">
+      <p class="kicker">{{ $p.faq.kicker }}</p>
+      <h2 id="faq-title">{{ $p.faq.title }}</h2>
+    </header>
+    {{- partial "faq.html" . }}
+  </div>
+</section>
+
+<section class="section" aria-labelledby="updates-title">
+  <div class="wrap updates-grid">
+    <div>
+      <header class="section-head reveal">
+        <p class="kicker">{{ $p.updates.kicker }}</p>
+        <h2 id="updates-title">{{ $p.updates.title }}</h2>
+      </header>
+      {{- with site.GetPage "/updates" }}
+      {{- with .RegularPages }}
+      {{- partial "post-list.html" (first 3 .) }}
+      {{- else }}
+      <p class="empty">{{ T "updates_empty" }}</p>
+      {{- end }}
+      <p class="more"><a class="button ghost" href="{{ .RelPermalink }}">{{ T "updates_all" }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</a></p>
+      {{- end }}
+    </div>
+    <div class="reveal">{{ partial "signup.html" . }}</div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="final-title">
+  <div class="wrap">
+    <div class="final inverse reveal">
+      <div>
+        <p class="kicker">{{ $p.final.kicker }}</p>
+        <h2 id="final-title">{{ $p.final.title }}</h2>
+        <p>{{ (partial "fmt.html" (dict "page" $ "text" $p.final.text)) }}</p>
+      </div>
+      <p class="actions">
+        <a class="button primary" href="{{ relLangURL $p.final.primary.url }}">{{ $p.final.primary.label }}{{ partial "icon.html" (dict "name" "arrow-right" "class" "icon-nudge") }}</a>
+        <a class="button" href="{{ site.Params.engineDiscussions }}">{{ $p.final.secondary_label }}</a>
+      </p>
+    </div>
+  </div>
 </section>
 {{ end }}
 
 {{ define "scripts" }}
-{{- $demo := resources.Get "js/drift-demo.js" | minify | fingerprint }}
+{{- $demo := partial "js.html" "drift-demo" }}
 <script src="{{ $demo.RelPermalink }}" integrity="{{ $demo.Data.Integrity }}" defer></script>
 {{ end }}

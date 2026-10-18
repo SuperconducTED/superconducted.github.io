@@ -6,6 +6,49 @@ disableKinds = ['taxonomy', 'term', 'rss']
 enableRobotsTXT = true
 timeZone = 'UTC'
 
+# The brand kit's SVGs live byte for byte in static/brand/ (data/brand.yaml). Mounting the
+# folder into assets/ as well lets templates serve minified, fingerprinted copies of them
+# (layouts/_partials/brand-img.html). Declaring a mount replaces the default for that
+# component, so assets/ itself is mounted again first.
+[module]
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'static/brand'
+    target = 'assets/brand'
+
+# Hugo's JavaScript minifier is off: scripts are minified by esbuild in layouts/_partials/js.html.
+# With it on, the HTML minifier re-minified the inline theme boot (renaming its variables again),
+# so the bytes no longer matched the SHA-256 hash in the CSP and browsers blocked the script.
+[minify]
+  disableJS = true
+
+[pagination]
+  pagerSize = 10
+
+# Two outputs beyond HTML, both built at build time and served as static files:
+#   SearchIndex: /<lang>/search.json, read by assets/js/search.js on the first search.
+#   Atom:        /<lang>/updates/atom.xml, the feed of the Updates section.
+# The built-in RSS output stays disabled (see disableKinds); Atom replaces it.
+[mediaTypes]
+  [mediaTypes.'application/atom+xml']
+    suffixes = ['xml']
+[outputFormats]
+  [outputFormats.SearchIndex]
+    mediaType = 'application/json'
+    baseName = 'search'
+    isPlainText = true
+    notAlternative = true
+  [outputFormats.Atom]
+    mediaType = 'application/atom+xml'
+    baseName = 'atom'
+    isPlainText = false
+    rel = 'alternate'
+[outputs]
+  home = ['html', 'searchindex']
+  section = ['html', 'atom']
+
 [build]
   [build.buildStats]
     enable = false
@@ -20,6 +63,11 @@ timeZone = 'UTC'
           inline = [['\(', '\)']]
     [markup.goldmark.renderer]
       unsafe = false
+  # Highlighting writes CSS classes (styled in site.css), not inline style attributes, which the
+  # pages' CSP (style-src 'self') would block.
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
   [markup.tableOfContents]
     startLevel = 2
     endLevel = 2
@@ -31,6 +79,18 @@ timeZone = 'UTC'
   brandGuide = 'https://github.com/SuperconducTED/.github/blob/main/brand/README.md'
   siteRepo = 'https://github.com/SuperconducTED/superconducted.github.io'
   tagline = 'Noise as a range, not a number.'
+  engineDiscussions = 'https://github.com/SuperconducTED/superconducted-noise-engine/discussions'
+  engineIssues = 'https://github.com/SuperconducTED/superconducted-noise-engine/issues'
+  [params.newsletter]
+    # The Buttondown username (https://buttondown.com/superconducted, created by Mert on
+    # 2026-10-18). Empty would remove the sign-up forms and the pop-up, and the CSP would go back
+    # to form-action 'none' (README, "Newsletter").
+    buttondown = 'superconducted'
+    # The newsletter relay (relay/, a Cloudflare Worker holding the Buttondown API key), as its
+    # full /subscribe URL. Set: the forms subscribe on the page through it, and its origin joins
+    # the CSP's connect-src. Empty: the forms post to Buttondown in a new tab, as before.
+    # Deployed by Mert on 2026-10-18 to his Cloudflare account (relay/README.md).
+    relay = 'https://superconducted-newsletter.superconducted.workers.dev/subscribe'
 
 [languages]
   [languages.en]
@@ -39,35 +99,47 @@ timeZone = 'UTC'
     locale = 'en'
     weight = 1
     [languages.en.params]
-      description = "SuperconducTED is a student research project building a fuzzy-logic noise engine for Qiskit Aer: a drifting quantum computer's noise, answered with a range instead of one number."
+      description = "SuperconducTED is a student research project at TED University building a fuzzy-logic noise engine for Qiskit Aer. It learns from a quantum computer's calibration history and reports noise as a range."
     [[languages.en.menus.main]]
       name = 'How it works'
       pageRef = '/how-it-works'
       weight = 1
     [[languages.en.menus.main]]
+      name = 'Updates'
+      pageRef = '/updates'
+      weight = 2
+    [[languages.en.menus.main]]
       name = 'Team'
       pageRef = '/team'
-      weight = 2
+      weight = 3
     [[languages.en.menus.main]]
       name = 'Get started'
       pageRef = '/get-started'
-      weight = 3
+      weight = 4
+      [languages.en.menus.main.params]
+        cta = true
   [languages.tr]
     contentDir = 'content/tr'
     label = 'Türkçe'
     locale = 'tr'
     weight = 2
     [languages.tr.params]
-      description = "SuperconducTED, Qiskit Aer için bulanık mantık tabanlı bir gürültü motoru geliştiren bir öğrenci araştırma projesidir: sürüklenen bir kuantum bilgisayarın gürültüsüne tek bir sayıyla değil, bir aralıkla yanıt verir."
+      description = "SuperconducTED, TED Üniversitesi'nde Qiskit Aer için bulanık mantık tabanlı bir gürültü motoru geliştiren bir öğrenci araştırma projesidir. Motor, kuantum bilgisayarın kalibrasyon geçmişinden öğrenir ve gürültüyü bir aralık olarak verir."
     [[languages.tr.menus.main]]
       name = 'Nasıl çalışır'
       pageRef = '/how-it-works'
       weight = 1
     [[languages.tr.menus.main]]
+      name = 'Güncellemeler'
+      pageRef = '/updates'
+      weight = 2
+    [[languages.tr.menus.main]]
       name = 'Ekip'
       pageRef = '/team'
-      weight = 2
+      weight = 3
     [[languages.tr.menus.main]]
       name = 'Başlarken'
       pageRef = '/get-started'
-      weight = 3
+      weight = 4
+      [languages.tr.menus.main.params]
+        cta = true

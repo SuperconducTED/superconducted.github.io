@@ -23,9 +23,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      HUGO_VERSION: 0.167.0
-      # sha256 of hugo_0.167.0_linux-amd64.tar.gz from the release's hugo_0.167.0_checksums.txt
-      HUGO_SHA256: 4d84519b9f619e6d4c3fb45a50157abeabeb724f859c60605f44c23def6e1169
+      # 0.168.0 fixes GHSA-r73q-gwx2-fpxm and embeds the same KaTeX (0.18.4) as 0.167.0, so
+      # static/katex/ is unchanged. A Hugo upgrade must re-check that pairing (README).
+      HUGO_VERSION: 0.168.0
+      # sha256 of hugo_0.168.0_linux-amd64.tar.gz from the release's hugo_0.168.0_checksums.txt
+      HUGO_SHA256: fada83ad56bb27ed4cb7dd81590303bdac16140f944ac4e66fc248117e2d5594
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -53,6 +55,13 @@ jobs:
           hugo build --gc --minify --printI18nWarnings --panicOnWarning --baseURL "${BASE_URL%/}/"
           # GitHub Pages serves /404.html for every missing path; Hugo writes one per language.
           cp public/en/404.html public/404.html
+
+      - name: Relay tests
+        # The newsletter relay (relay/) is deployed by hand to Cloudflare; its tests run here so a
+        # change cannot land untested. Node 20+ ships on the runner image.
+        run: |
+          node --version
+          node --test relay/test/relay.test.js
 
       - name: Check
         run: |

@@ -6,3 +6,7 @@
 # Python
 __pycache__/
 *.pyc
+
+# Wrangler's local state from deploying the relay (it caches the Cloudflare account there)
+/relay/.wrangler/
+/relay/node_modules/

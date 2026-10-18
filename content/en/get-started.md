@@ -1,7 +1,8 @@
 ---
 title: "Get started"
+kicker: "Install"
 description: "Install the SuperconducTED noise engine, run its tests, poll IBM calibrations, and take part."
-lead: "Install the engine, run its tests, and see how to take part. You need Python 3.11 or newer and git."
+lead: "Install the engine and run its test suite with the commands below. You need Python 3.11 or newer and git; every block has a Copy button."
 toc: true
 ---
 
@@ -23,24 +24,27 @@ pip install -e . --no-deps
 
 ## Run the tests
 
+The suite has {{% claim "tests" %}} tests and needs no IBM account.
+
 ```bash
 pytest
 ```
 
 ## Poll IBM calibrations
 
-The `superconducted-poll` command archives calibration snapshots from an IBM backend. It needs an
-IBM Quantum token.
+`superconducted-poll` archives calibration snapshots from an IBM backend. It needs an IBM Quantum
+token.
 
 ```bash
 cp .env.example .env
 superconducted-poll --backend ibm_fez
 ```
 
-Put your token in `.env` as `IBM_QUANTUM_TOKEN`. The `.env` file is ignored by git: never commit
-a real token. The engine's
-[README](https://github.com/SuperconducTED/superconducted-noise-engine#readme) lists the
-polling failure modes and their fixes.
+- **Where the token goes:** in `.env`, as `IBM_QUANTUM_TOKEN`.
+- **Never commit it.** git ignores `.env`; keep it that way.
+- **If polling fails,** the engine's
+  [README](https://github.com/SuperconducTED/superconducted-noise-engine#readme) lists the
+  failure modes and their fixes.
 
 ## Read the design
 
@@ -50,12 +54,11 @@ polling failure modes and their fixes.
   every architectural decision, with its status.
 - [Numerical-claims register](https://github.com/SuperconducTED/superconducted-noise-engine/blob/main/docs/numerical-claims.md):
   where every figure the project states comes from.
-- [How it works](../how-it-works/): the idea and the equations, on this site.
 
 ## Take part
 
-Questions and ideas go to the engine's
-[Discussions](https://github.com/SuperconducTED/superconducted-noise-engine/discussions), bugs
-to its [issues](https://github.com/SuperconducTED/superconducted-noise-engine/issues). For a
-larger change, open an issue first so the approach can be agreed before the work starts. The
-code is under the MIT licence.
+- **Questions and ideas:** the engine's
+  [Discussions](https://github.com/SuperconducTED/superconducted-noise-engine/discussions).
+- **Bugs:** its [issues](https://github.com/SuperconducTED/superconducted-noise-engine/issues).
+- **A larger change:** open an issue first, so you and the team agree on the approach before the
+  work starts. The code is under the MIT licence.
