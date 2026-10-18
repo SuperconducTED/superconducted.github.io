@@ -702,3 +702,13 @@ confirmation email. Both need one real address, Mert's own, through the check in
 | `.github/workflows/pages.yml`, `relay/package.json`, `relay/README.md` | Run `node --test` on `relay/test/relay.test.js`, not on the folder. From Node 21 on, a folder argument is loaded as a script and crashes (`Cannot find module ...\relay\test`), so the step as first written would have failed on any runner with Node 22 or later; it was never pushed, so CI never ran it. On Node 24.20.0: 14 of 14 pass through both the workflow command and `npm test`. |
 | `scripts/mutate_relay.py` | Same file argument, and the unmutated tests now run first: a crashing runner would otherwise report every planted fault as caught (the final check would still have failed, but only after six false `KILL` lines). With the folder form put back on a throwaway copy, the script stops at the baseline and says why; as committed, 6 of 6 faults are caught and the restored tests pass. |
 | `.gitignore` | Ignores `relay/.wrangler/` (Wrangler's cache, which holds the Cloudflare account details) and `relay/node_modules/`. |
+
+First real sign-up (2026-10-18): Mert posted his own address to the live relay with `curl.exe`
+from the site's origin and got `{"ok":true}`. That answer needs Buttondown to have returned 200 or
+201, or 400 with `email_already_exists` or `subscriber_suppressed`; a missing or wrong key, or one
+without subscriber access, gets 401 or 403 and would have come back as `unavailable`, and a
+rejected `metadata` object would have too. So the stored secret is a working subscriber key and
+Buttondown accepts the `source` and `language` metadata keys, which closes the open question
+above. The confirmation email is the remaining check and is Mert's to see. (An earlier attempt
+with the guide's placeholder text left in place got `400 invalid` from the relay, as it should,
+before anything reached Buttondown.)
