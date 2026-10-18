@@ -8,7 +8,7 @@
 // state, which says what happens next: confirm in the Buttondown tab, then click the link in
 // the email. The page cannot see Buttondown's answer, so it never claims more than that.
 // The address is never stored or logged; it goes from the form straight to Buttondown. After a
-// submit, the preference key superconducted-newsletter = "subscribed" hides the banner.
+// submit, the preference key superconducted-newsletter = "subscribed" hides the pop-up invitation.
 (function () {
   "use strict";
   var COOL_DOWN_MS = 8000;
@@ -50,9 +50,10 @@
         if (box) box.classList.add("is-done");
         if (done) done.focus();
       }, 0);
-      // Stop inviting this browser to sign up: theme-boot.js hides the banner on later pages.
+      // Stop inviting this browser to sign up: theme-boot.js hides the pop-up on later pages, and
+      // site.js closes it now if the sign-up came from the box on the page.
       try { window.localStorage.setItem("superconducted-newsletter", "subscribed"); } catch (e) { /* not remembered */ }
-      document.documentElement.classList.add("nl-hidden");
+      document.dispatchEvent(new CustomEvent("superconducted:subscribed", { detail: { form: form } }));
       window.setTimeout(function () { busy = false; button.disabled = false; }, COOL_DOWN_MS);
     });
   }

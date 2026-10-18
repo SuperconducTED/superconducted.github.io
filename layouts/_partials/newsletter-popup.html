@@ -1,0 +1,34 @@
+{{- /* The newsletter invitation: a floating card in the style of a consent pop-up, bottom left on
+wide screens and a bottom sheet on phones, sliding in shortly after the page loads. It holds its own
+Buttondown form (the same contract as signup.html: a standard POST to a new tab, validated by
+newsletter.js, double opt-in on Buttondown's side), so a visitor can subscribe without leaving the
+page. "No thanks", the close button and Escape store superconducted-newsletter = "dismissed"; a
+sign-up stores "subscribed"; theme-boot.js reads either before paint and hides the card on later
+pages. It is placed early in the document so keyboard users meet it first, and it never takes
+focus by itself. Rendered only while params.newsletter.buttondown is set, and only with script
+(it could not be closed without it; the sign-up box on Home and the Updates pages stays for
+everyone). */ -}}
+{{- with site.Params.newsletter.buttondown }}
+<section class="nl-popup signup inverse needs-js" aria-labelledby="nl-popup-title">
+  <button class="icon-button nl-popup-close" type="button" data-nl-dismiss aria-label="{{ T "popup_close" }}" title="{{ T "popup_close" }}">{{ partial "icon.html" "close" }}</button>
+  <p class="kicker">{{ T "popup_label" }}</p>
+  <h2 class="signup-title" id="nl-popup-title">{{ T "popup_title" }}</h2>
+  <form class="signup-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ . | urlquery }}" method="post" target="_blank" rel="noopener" data-error-empty="{{ T "signup_error_empty" }}" data-error-invalid="{{ T "signup_error_invalid" }}">
+    <p>{{ T "popup_text" }}</p>
+    <div class="field">
+      <label class="visually-hidden" for="nl-popup-email">{{ T "signup_label" }}</label>
+      <div class="field-row">
+        <input class="input" type="email" id="nl-popup-email" name="email" required maxlength="254" autocomplete="email" inputmode="email" spellcheck="false" placeholder="{{ T "signup_placeholder" }}" aria-describedby="nl-popup-error">
+        <input type="hidden" name="embed" value="1">
+        <button class="button primary" type="submit">{{ T "popup_button" }}</button>
+      </div>
+      <p class="field-error" id="nl-popup-error" aria-live="polite"></p>
+    </div>
+    <p class="nl-popup-foot"><button class="button ghost small" type="button" data-nl-dismiss>{{ T "popup_dismiss" }}</button></p>
+  </form>
+  <div class="signup-done" role="status" aria-live="polite" tabindex="-1">
+    <span class="done-mark">{{ partial "icon.html" "check" }}</span>
+    <p><strong>{{ T "signup_done_title" }}</strong> {{ T "signup_done_text" }}</p>
+  </div>
+</section>
+{{- end }}

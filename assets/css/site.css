@@ -173,22 +173,37 @@ main:focus { outline: none; }
 .icon-button:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
 .icon-button:active { transform: scale(0.94); }
 
-/* ---------- Newsletter banner: above the header, scrolls away, closable ---------- */
-.nl-banner { border-bottom: 1px solid var(--grid); }
-.nl-hidden .nl-banner { display: none; }
-.nl-banner-row { display: flex; align-items: center; gap: 0.5rem 1rem; min-height: 3rem; padding-block: 0.45rem; }
-.nl-banner-text { display: flex; align-items: center; gap: 0.6rem; margin: 0 auto 0 0; font-size: 0.92rem; color: var(--text-2); }
-.nl-banner-text strong { color: var(--text); font-weight: 500; }
-.nl-banner-text .icon { color: var(--accent); }
-.nl-banner-cta { flex: none; }
-.nl-cta-short { display: none; }
-.nl-banner-close { width: 2.25rem; height: 2.25rem; }
-/* Phones: one line, the newsletter's name, a short button and the close control. */
+/* ---------- Newsletter invitation: a consent-style pop-up card ---------- */
+/* Two classes: .signup (later in this file) sets position: relative, which must not win here. */
+.signup.nl-popup {
+  position: fixed; left: 16px; bottom: 16px; z-index: 45; width: min(24rem, calc(100vw - 32px));
+  max-height: calc(100vh - 32px); overflow-y: auto; padding: 1.25rem 1.25rem 0.9rem;
+  box-shadow: 0 30px 70px -24px rgba(0, 0, 0, 0.55);
+}
+.nl-hidden .nl-popup { display: none; }
+/* It slides in a moment after the page loads; until then it is invisible and cannot take focus. */
+@media (prefers-reduced-motion: no-preference) {
+  .nl-popup { animation: nl-in 0.5s var(--ease) 1.2s both; }
+}
+@keyframes nl-in { from { opacity: 0; transform: translateY(24px); visibility: hidden; } to { opacity: 1; transform: none; visibility: visible; } }
+.nl-popup .signup-title { font-size: 1.3rem; margin: 0.6rem 2.5rem 0.4rem 0; }
+.nl-popup p { font-size: 0.92rem; }
+/* Field and button share one line: an input's intrinsic minimum width would otherwise wrap it. */
+.nl-popup .input { flex: 1 1 8rem; min-width: 0; min-height: 2.75rem; }
+.nl-popup .field-error { min-height: 0; }
+.nl-popup .field-error:not(:empty) { margin-top: 0.4rem; }
+/* .signup > * sets position: relative on every child, so this needs the extra class to stay pinned. */
+.signup .nl-popup-close { position: absolute; z-index: 2; top: 0.7rem; right: 0.7rem; width: 2.25rem; height: 2.25rem; }
+.nl-popup-foot { margin: 0.5rem 0 0 !important; }
+.nl-popup-foot .button { padding-inline: 0.5rem; color: var(--text-2); }
+.nl-popup .signup-done p { margin: 0.75rem 0 0.4rem; }
+/* Phones: a bottom sheet across the width; the floating buttons step aside while it is open. */
 @media (max-width: 40rem) {
-  .nl-banner-row { gap: 0.5rem; }
-  .nl-banner-text { font-size: 0.85rem; min-width: 0; }
-  .nl-rest, .nl-cta-long, .nl-banner-cta .icon { display: none; }
-  .nl-cta-short { display: inline; }
+  .signup.nl-popup { left: 12px; right: 12px; bottom: 12px; width: auto; padding: 1rem 1rem 0.6rem; }
+  .nl-popup .kicker { display: none; }
+  .nl-popup .signup-title { font-size: 1.15rem; margin-top: 0.1rem; }
+  .nl-popup p { font-size: 0.86rem; margin-bottom: 0.75rem; }
+  html:not(.nl-hidden) body:has(.nl-popup) .fab-stack { display: none; }
 }
 
 /* ---------- Header: sticky, with the reading-progress bar ---------- */
@@ -712,7 +727,7 @@ html:not(.js) .demo-chart { display: none; }
   }
   html { font-size: 11pt; }
   body { background: #FFFFFF; color: #000000; }
-  .site-header, .nl-banner, .fab-stack, .contact-menu, .skip, .progress, .search, .theme-switch, .menu-toggle, .copy,
+  .site-header, .nl-popup, .fab-stack, .contact-menu, .skip, .progress, .search, .theme-switch, .menu-toggle, .copy,
   .signup, .final .actions, .replay, .toc, .hero::before, .readout::before, .final::after, .pager { display: none !important; }
   .print-only { display: block; margin-bottom: 1rem; font-size: 9pt; color: #333333; }
   .on-dark { display: none !important; }

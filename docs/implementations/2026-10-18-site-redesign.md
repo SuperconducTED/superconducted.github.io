@@ -533,3 +533,32 @@ cannot be turned off for public forms, per its documentation).
 
 Still owed: Mert's Buttondown username. Until it is set, production shows neither the form nor
 the banner.
+
+### The banner became a pop-up (Mert, same day)
+
+Before the bar was pushed, Mert asked for it to work like a cookie-policy banner, in a pop-up
+style. The bar was replaced, in the same pull request, by a floating card
+(`layouts/_partials/newsletter-popup.html`): bottom left at up to 24rem wide on wide screens,
+clear of the floating buttons; a bottom sheet with 12 px margins on phones, where the floating
+buttons step aside while it is open (`:has()`). It slides in 1.2 s after load (invisible and
+unfocusable until then; immediately under reduced motion), never takes focus by itself, and sits
+early in the document so keyboard users meet it first. It carries its own Buttondown form, so a
+visitor subscribes without leaving the page; `newsletter.js` (now loaded once per page from
+`baseof.html`, since a second load would wire every form twice) validates it like the box and
+shows the done state inside the card until it is closed. "No thanks", the close button and Escape
+store `dismissed`; a sign-up stores `subscribed`, and a sign-up through the page's box closes the
+card too (a `superconducted:subscribed` event). The footer privacy line now says pop-up choices.
+
+Three layout bugs were found by the tests and screenshots, all CSS specificity: `.signup`
+(later in the file) overrode the card's `position: fixed`, so it sat in the page flow; `.signup >
+*` gave the close button `position: relative`; and the full-width label line painted over the
+close button, swallowing its clicks. The email field's intrinsic minimum width also pushed the
+button to its own line. All fixed (two-class selectors, `z-index`, `min-width: 0`).
+
+Tests (headless Chrome, placeholder username, buttondown.com resolved to a closed local port):
+19 pop-up checks (hidden during the delay then shown; on seven page types in both languages;
+bottom left with no overlap; "No thanks", close and Escape each hide it and remember; validation
+inside it; done state inside it; a box sign-up closes it; 390 px bottom sheet of 301 px with the
+floating buttons hidden and restored; no console errors), the 15 sign-up box checks (now scoped
+to the box, since a page has two forms), 19 interface checks, the stale-page checks, 17 of 17 site
+checks on both the production build and the placeholder build, and 18 of 18 mutations.

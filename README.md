@@ -103,11 +103,13 @@ the form needs only the public username. Buttondown's RSS-to-email automation (a
 reads Atom feeds too, so with it a new post reaches subscribers without a manual send; each entry's
 Atom `id` is its permanent URL, which Buttondown uses to avoid sending a post twice.
 
-Setting the username also turns on the newsletter banner: a slim bar above the header on every
-page whose link goes to the sign-up box (on Home and the Updates pages) or to the Updates page's
-box (everywhere else). Closing it, or signing up, stores `superconducted-newsletter` in the
-visitor's browser, and the inline boot script hides the bar before paint from then on. Clearing
-the username removes the form, the banner and the CSP's `form-action` together.
+Setting the username also turns on the newsletter invitation: a card in the style of a consent
+pop-up (bottom left on wide screens, a bottom sheet on phones) that slides in shortly after a
+page loads, on every page, with its own email field. "No thanks", its close button, Escape or a
+sign-up store `superconducted-newsletter` in the visitor's browser, and the inline boot script
+hides the card before paint from then on. It needs script, so without script only the sign-up
+box on Home and the Updates pages remains. Clearing the username removes the form, the pop-up and
+the CSP's `form-action` together.
 
 ## Security
 

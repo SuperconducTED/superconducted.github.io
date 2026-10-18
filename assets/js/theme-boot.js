@@ -3,7 +3,7 @@
 //    hide, with no flash either way.
 //  * Applies a saved light or dark choice so the page never flashes the other theme. With no
 //    saved choice ("System") the theme follows the operating system.
-//  * Hides the newsletter banner before it is drawn once the visitor has closed it or signed up
+//  * Hides the newsletter pop-up before it is drawn once the visitor has closed it or signed up
 //    (class "nl-hidden"), so it never appears and then jumps away.
 (function () {
   var root = document.documentElement;
@@ -13,5 +13,5 @@
     if (t === "light" || t === "dark") root.setAttribute("data-theme", t);
     var n = window.localStorage.getItem("superconducted-newsletter");
     if (n === "dismissed" || n === "subscribed") root.classList.add("nl-hidden");
-  } catch (e) { /* storage blocked: follow the system setting, show the banner */ }
+  } catch (e) { /* storage blocked: follow the system setting, show the pop-up */ }
 })();

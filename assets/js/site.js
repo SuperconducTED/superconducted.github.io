@@ -12,7 +12,7 @@
 //   copy       Copy buttons on code blocks, with an announced "Copied" state
 //   print      opens every <details> while printing, restores them after
 //   search     opens the dialog (button, "/", Ctrl/Cmd+K) and loads search.js on first use
-//   banner     newsletter banner: close (remembered), and jump to the sign-up box with focus
+//   newsletter pop-up invitation: "No thanks", close and Escape (remembered); hides after a sign-up
 //
 // Storage keys: superconducted-theme, superconducted-lang and superconducted-newsletter only
 // (preferences, no tokens or personal data). Every storage access is wrapped: blocked storage just means no memory.
@@ -69,30 +69,25 @@
     store("superconducted-lang", ev.currentTarget.getAttribute("data-lang"));
   });
 
-  // ---- Newsletter banner ----------------------------------------------------------------------
-  var banner = document.querySelector(".nl-banner");
-  if (banner) {
-    var close = banner.querySelector(".nl-banner-close");
-    if (close) {
-      close.addEventListener("click", function () {
-        store("superconducted-newsletter", "dismissed");
-        root.classList.add("nl-hidden");
-        var brand = document.querySelector(".brand");
-        if (brand) brand.focus(); // the focused button just disappeared; land on the next control
-      });
-    }
-    // On a page that has the sign-up box, the link scrolls to it; put the cursor in the field.
-    var jump = banner.querySelector("[data-nl-jump]");
-    if (jump && jump.getAttribute("href").charAt(0) === "#") {
-      jump.addEventListener("click", function (ev) {
-        var box = document.getElementById("get-updates");
-        if (!box) return;
-        ev.preventDefault();
-        box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
-        var field = box.querySelector("input[type='email']") || box.querySelector("a");
-        if (field) field.focus({ preventScroll: true });
-      });
-    }
+  // ---- Newsletter invitation (pop-up card) ----------------------------------------------------
+  var popup = document.querySelector(".nl-popup");
+  if (popup) {
+    var dismissPopup = function () {
+      store("superconducted-newsletter", popup.classList.contains("is-done") ? "subscribed" : "dismissed");
+      var hadFocus = popup.contains(document.activeElement);
+      root.classList.add("nl-hidden");
+      // The control that had focus just vanished; continue from the top of the content.
+      if (hadFocus) { var main = document.getElementById("main"); if (main) main.focus({ preventScroll: true }); }
+    };
+    onAll("[data-nl-dismiss]", "click", dismissPopup);
+    popup.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") { ev.preventDefault(); dismissPopup(); }
+    });
+    // Signed up through the box on the page instead: the invitation has done its job.
+    document.addEventListener("superconducted:subscribed", function (ev) {
+      var form = ev.detail && ev.detail.form;
+      if (form && !popup.contains(form)) root.classList.add("nl-hidden");
+    });
   }
 
   // ---- Header state, back to top ------------------------------------------------------------
