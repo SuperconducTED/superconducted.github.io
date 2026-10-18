@@ -15,8 +15,11 @@ the site").
 
 ## What it guarantees
 
-- **Only the website can use it.** Requests whose `Origin` is not in `ALLOWED_ORIGINS` are refused;
-  answers carry CORS headers for that origin alone.
+- **Only the website can use it from a browser.** Requests whose `Origin` is not in
+  `ALLOWED_ORIGINS` are refused; answers carry CORS headers for that origin alone. That stops other
+  sites from signing their visitors up through this one. It cannot stop a script, which can send
+  any `Origin` (the curl check below does), so scripted abuse meets the double opt-in and the spam
+  brakes instead.
 - **Double opt-in.** Every new address is created as `unactivated`, so Buttondown emails a
   confirmation link and adds nobody until they click it.
 - **No subscriber lookups.** New, existing and suppressed addresses all get the same answer.
@@ -24,7 +27,9 @@ the site").
   and per hashed address per minute, approximate and per location), and Buttondown's own spam
   firewall, which receives the visitor's IP as Buttondown's API documentation recommends.
 - **No secrets in the repository, no logs.** The key exists only as a Worker secret; the Worker
-  logs nothing about requests (no addresses, no IPs).
+  logs nothing about requests (no addresses, no IPs), and `wrangler.toml` turns off Cloudflare's
+  own request logs (`[observability] enabled = false`), which are on by default for new Workers.
+  A change to `wrangler.toml` reaches the live Worker only when it is deployed again.
 
 ## Deploy (Mert)
 

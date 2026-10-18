@@ -78,8 +78,9 @@ export async function handle(request, env, deps = {}) {
   const ip = request.headers.get("CF-Connecting-IP") || "";
   if (env.SIGNUP_LIMITER) {
     // Cloudflare's rate-limiting binding: per location and approximate by its own description,
-    // so it brakes floods rather than counting exactly. The address is hashed so the key holds
-    // no personal data.
+    // so it brakes floods rather than counting exactly. The address is hashed so the key never
+    // spells it out; the hash is unsalted, so anyone who already has an address can recompute it,
+    // and only Cloudflare, which carries the request anyway, ever sees these keys.
     const mailKey = "mail:" + (await sha256(email.toLowerCase()));
     const [byIp, byMail] = await Promise.all([
       env.SIGNUP_LIMITER.limit({ key: "ip:" + (ip || "unknown") }),
