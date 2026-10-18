@@ -678,9 +678,9 @@ bound. Whether Mert's Cloudflare plan accepts that rate limit still shows only o
 Mert deployed the Worker from his machine (`wrangler login`, `deploy`, and the
 `BUTTONDOWN_API_KEY` secret) after registering the `workers.dev` subdomain `superconducted`, so the
 relay answers at `https://superconducted-newsletter.superconducted.workers.dev/subscribe`. The
-deploy went through with the `[[ratelimits]]` block in place, so the plan accepted the binding.
-The address refused TLS for about ten minutes after the subdomain was registered (alert 40, no
-certificate yet) and then came up.
+deploy finished with `wrangler.toml` unchanged (the `[[ratelimits]]` block still in place), so his
+plan accepted the rate-limit binding. When first probed, the address refused TLS (alert 40, no
+certificate for the new subdomain yet); it answered from 11:01 local time, polled every 30 s.
 
 Probed from outside with requests that stop before Buttondown, so no address was sent and no
 subscriber was created:
