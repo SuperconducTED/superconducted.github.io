@@ -140,6 +140,12 @@ the workflow, on a GitHub runner, is the check from an unfiltered network.
 Unchanged and still passing: production build, all 17 site checks; the site checker's mutation
 test, 20 of 20 faults caught; relay unit tests 15 of 15; the relay mutation test, 6 of 6.
 
+From an unfiltered network: the workflow's own run on PR #9 (run 39124976843, GitHub-hosted
+runner, head `bd126b6`) checked the live relay for origin `https://superconducted.github.io` and
+reported `preflight ok` (204 with CORS), `invalid ok` (400 invalid), `origin ok` (403 without
+CORS) and "all 3 checks ok". The Pages run on the same head passed all 17 site checks and the relay
+tests, 15 of 15.
+
 ## Related Docs
 
 - `docs/implementations/2026-10-18-site-redesign.md`: the redesign and the relay's plan and
